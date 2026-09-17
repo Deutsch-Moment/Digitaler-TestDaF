@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>TestDaF Übung – Text &amp; Fragen</title>
+<style>
+  :root{
+    --primary:#0e6e8c;
+    --accent:#c8102e;
+    --bg-box:#dde3e8;
+    --border:#0e6e8c;
+  }
+  *{box-sizing:border-box; font-family: Arial, Helvetica, sans-serif;}
+  body{margin:0; padding:20px; background:#f4f6f7; color:#222;}
+  .header{background:var(--primary); color:#fff; padding:14px 20px; font-size:22px; font-weight:bold; border-radius:4px 4px 0 0;}
+  .instructions{background:#eaf1f4; padding:16px 20px; font-size:15px; line-height:1.5;}
+  .timer{display:inline-block; border:2px solid var(--primary); border-radius:50%; width:70px; height:70px; text-align:center; line-height:70px; font-weight:bold; color:var(--primary); margin-top:10px;}
+  .toolbar{display:flex; justify-content:flex-end; gap:8px; padding:10px 20px 0 20px; background:#fff;}
+  .toolbtn{width:38px; height:38px; border:1px solid var(--primary); background:#fff; color:var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px;}
+  .toolbtn.small{font-size:12px;}
+  .toolbtn.big{font-size:16px;}
+  .toolbtn.active{background:var(--primary); color:#fff;}
+  .main{display:flex; gap:16px; padding:10px 20px 20px 20px; background:#fff;}
+  .textpanel{flex:1; max-height:600px; overflow-y:auto; padding-right:10px; border-right:1px solid #ccc; font: size 15px; line-height:1.6;}
+  .textpanel h3{color:var(--primary);}
+  .textpanel p{margin-bottom:16px;}
+  .textpanel .pnum{font-weight:bold; color:var(--primary);}
+  .textpanel mark.hl{background:#fdea63; cursor:pointer; border-radius:2px;}
+  .textpanel.marking{cursor:text;}
+  .qpanel{flex:1.2;}
+  .qrow{background:var(--bg-box); border:1px solid #aab; border-radius:4px; margin-bottom:10px; overflow:hidden;}
+  .qhead{padding:10px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size: 15px;}
+  .qhead b{color:var(--primary); margin-right:6px;}
+  .qhead.answered{background:#eef3f5;}
+  .qbody{display:none; padding:8px 14px 14px 14px; background:#fff;}
+  .qbody.open{display:block;}
+  .option{display:block; width:100%; text-align:left; padding:8px 10px; margin:4px 0; border:1px solid #bbb; border-radius:4px; background:#fdfdfd; cursor:pointer; user-select:text; font-size:15px;}
+  .option.selected{border-color:var(--primary); background:#dceaf0;}
+  .option.correct{border-color:green; background:#e3f7e3;}
+  .option.wrong{border-color:var(--accent); background:#fbe4e7;}
+  .option,
+.option * {
+    font-size: 15px !important;
+}
+
+.option{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:8px 10px;
+    margin:4px 0;
+    border:1px solid #bbb;
+    border-radius:4px;
+    background:#fdfdfd;
+    cursor:pointer;
+    user-select:text;
+    font-size:15px;
+}
+  .footer{display:flex; justify-content:flex-end; gap:10px; padding:16px 20px;}
+  button{background:var(--accent); color:#fff;; border:none; padding:10px 20px; border-radius:4px; font-size:15px; cursor:pointer;}
+  button.secondary{background:#888;}
+  #result{padding:0 20px 20px; font-weight:bold;}
+  </style>
+</head>
+<body>
+
+<div class="header">LESEN – Aufgabentyp 3: Text &amp; Fragen</div>
+
+<div class="instructions">
+  Lesen Sie den Text.<br>
+  <strong>Beantworten Sie die Fragen 1–7.</strong><br>
+  Klicken Sie die Fragen an und entscheiden Sie, welche Lösung passt.<br>
+  Für jede Frage gibt es genau eine richtige Lösung.
+  <div class="timer" id="timer">15:10</div>
+</div>
+
+<div class="toolbar">
+  <button class="toolbtn small" onclick="changeFontSize(-1)" title="Verkleinern">A-</button>
+  <button class="toolbtn big" onclick="changeFontSize(1)" title="Vergrößern">A+</button>
+  <button class="toolbtn" id="markBtn" onclick="toggleMarking()" title="Markieren">✎</button>
+</div>
+
+<div class="main">
+  <div class="textpanel" id="textpanel"></div>
+  <div class="qpanel" id="qpanel"></div>
+</div>
+
+<div id="result"></div>
+
+<div class="footer">
+
+  <button class="action secondary" onclick="resetExercise()">
+    Zurücksetzen
+  </button>
+
+  <button class="action" onclick="checkAnswers()">
+    Prüfen
+  </button>
+
+  <button class="action" onclick="saveAT3AndGoToNext()">Weiter</button>
+</button>
+
+</div>
+
+<script>
+/* ============================================================
+   HIER ANPASSEN: Neue Übung = Titel, Absätze und Fragen ersetzen.
+   correct = Index (0=a, 1=b, 2=c, 3=d)
+   ============================================================ */
+const textTitle = "Oasen der Tiefsee – Leben ohne Sonnenlicht";
+
+const paragraphs = [
+
+"Lange Zeit galt die Tiefsee als eine biologische Einöde. Da das Sonnenlicht nur wenige hundert Meter in die Ozeane eindringt, schien eine Primärproduktion von Biomasse, die auf Photosynthese basiert, in mehreren tausend Metern Tiefe unmöglich. Man nahm an, dass die dortigen Organismen ausschließlich von organischen Überresten leben, die aus den oberen Wasserschichten herabsinken – dem sogenannten „Meeresschnee“. Da diese Nahrungsquelle jedoch extrem spärlich ist, gingen Biologen davon aus, dass in der ewigen Dunkelheit nur eine sehr geringe Dichte an Kleinstlebewesen existieren könne. Diese Annahme wurde jedoch Ende der 1970er Jahre durch eine Entdeckung radikal widerlegt, die das biologische Weltbild auf den Kopf stellte.",
+
+"Ein Team von Meeresforschern stieß im Pazifik mithilfe des Tauchboots *Alvin* auf hydrothermale Quellen, sogenannte „Schwarze Raucher“. Aus diesen geysirartigen Schloten strömt mineralreiches, bis zu 400 Grad Celsius heißes Wasser in den eiskalten Ozean. Überraschenderweise waren diese geothermalen Quellen von einer unerwarteten Fülle an exotischen Tieren umgeben: riesige Röhrenwürmer, blinde Krabben und dichte Muschelkolonien. Da Sonnenlicht als Energiequelle in dieser Tiefe definitiv ausschied, mussten diese komplexen Ökosysteme auf einer völlig anderen, bis dato unbekannten Grundlage florieren.",
+
+"Die Auflösung dieses Rätsels lieferte die Entdeckung der Chemosynthese. Bestimmte spezialisierte Bakterien nutzen nicht das Licht, sondern die im geothermalen Wasser gelösten chemischen Verbindungen – insbesondere giftigen Schwefelwasserstoff –, um Energie zu gewinnen und organische Stoffe aufzubauen. Diese Mikroorganismen bilden das Fundament des gesamten Tiefsee-Ökosystems. Sie wandeln die anorganischen Stoffe der Erdkruste in nährstoffreiche Biomasse um. Damit bewiesen die Forscher, dass hochentwickeltes Leben auf der Erde fundamental unabhängig von solarer Energie entstehen und gedeihen kann.",
+
+"Besonders faszinierend ist die Symbiose, die viele Tiefseebewohner mit diesen Bakterien eingegangen sind. Der Röhrenwurm *Riftia pachyptila* besitzt beispielsweise weder einen Mund noch einen Darm. Stattdessen beherbergt er in einem speziellen Organ Milliarden von chemosynthetischen Bakterien. Der Wurm nimmt über seine roten Kiemen Schwefelwasserstoff, Sauerstoff und Kohlendioxid aus dem Wasser auf und transportiert diese Stoffe über sein Blut direkt zu den Mikroorganismen. Im Gegenzug versorgen die Bakterien ihren Wirt mit allen lebensnotwendigen Nährstoffen. Ohne diese physiologische Kooperation könnten die komplexen Vielzeller in dieser toxischen Umgebung nicht existieren.",
+
+"Die Lebensdauer dieser hydrothermalen Oasen ist jedoch zeitlich stark begrenzt. Da die tektonischen Platten sich kontinuierlich bewegen, versiegt der Zufluss von heißem Wasser an den einzelnen Schloten oft nach wenigen Jahrzehnten. Sobald die chemische Energiezufuhr stoppt, bricht das gesamte Ökosystem innerhalb kürzester Zeit zusammen. Um das Überleben ihrer Art zu sichern, müssen die Organismen in der Lage sein, neue, oft hunderte Kilometer entfernte Quellen zu besiedeln. Forscher vermuten, dass die Larven vieler Tiefseearten über Tiefseeströmungen transportiert werden oder wandernde Walkadaver auf dem Meeresboden als temporäre „Trittsteine“ nutzen, um die Distanzen zu überbrücken.",
+
+"Die Entdeckung dieser Lebensformen hat weitreichende Implikationen für die Astrobiologie. Wenn Leben in der Tiefsee unter extremem Druck, eisigen Temperaturen und völliger Dunkelheit allein durch chemische Energie gedeihen kann, erhöht dies die Wahrscheinlichkeit für extraterrestrisches Leben dramatisch. Als heiße Kandidaten gelten die eisbedeckten Monde des Jupiters (Europa) und Saturns (Enceladus). Unter ihren dicken Eispanzern werden gigantische Ozeane vermutet, auf deren Grund ebenfalls hydrothermale Aktivitäten stattfinden könnten. Die irdische Tiefsee dient Wissenschaftlern somit heute als Labor, um die Bedingungen für Leben im Weltall besser zu verstehen.",
+
+];
+
+const questions = [
+
+  { stem:"Die Tiefsee galt laut Absatz 1 lange Zeit als lebensarm, weil ...",
+    options:[
+      "organische Überreste aus den oberen Schichten die Tiefsee nicht erreichten.",
+      "die Entdeckung von Meeresströmungen die Forscher vor Rätsel stellte.",
+      "dortige Kleinstlebewesen von größeren Raubfischen vollständig verdrängt wurden.",
+      "die Abwesenheit von Sonnenlicht eine effektive Nahrungsproduktion unmöglich machte."
+    ],
+    correct:3 },
+
+  { stem:"Welche der folgenden Aussagen fasst am besten den Inhalt aus Absatz 2 zusammen?",
+    options:[
+      "Heißes Wasser verhindert die Entstehung von hochentwickelten Tieren.",
+      "Erst durch das Tauchboot *Alvin* wurden Tiefsee-Krabben im Pazifik ausgerottet.",
+      "An hydrothermalen Quellen wurde trotz extremer Bedingungen eine reiche Tierwelt entdeckt.",
+      "Meeresforscher suchten gezielt nach Muschelkolonien in der Nähe von Vulkanen."
+    ],
+    correct:2 },
+
+  { stem:"Welche der folgenden Aussagen findet sich in Absatz 3 wieder?",
+    options:[
+      "Schwefelwasserstoff dient bestimmten Bakterien als primäre Energiequelle.",
+      "Die Chemosynthese ist ein Prozess, der nur in Anwesenheit von schwachem Licht funktioniert.",
+      "Mikroorganismen wandeln organische Stoffe der Erdkruste in anorganische Biomasse um.",
+      "Hochentwickeltes Leben auf der Erde benötigt in jedem Fall solare Energie."
+    ],
+    correct:0 },
+
+  { stem:"Die Forscher interessieren sich laut Absatz 4 für den Röhrenwurm, weil ...",
+    options:[
+      "er Schwefelwasserstoff nutzt, um seine Beute im tiefen Wasser zu vergiften.",
+      "seine Kiemen in der Lage sind, reines Sonnenlicht chemisch zu speichern.",
+      "er ohne ein eigenes Verdauungssystem durch die Hilfe von Bakterien überlebt.",
+      "die Bakterien in seinem Körper schädliche Stoffe vollständig vernichten."
+    ],
+    correct:2 },
+
+  { stem:"Die untersuchten Lebensräume in der Tiefsee zeigen laut Absatz 5",
+    options:[
+      "eine konstante Stabilität über Jahrhunderte hinweg.",
+      "die Notwendigkeit für Organismen, sich an versiegende Energiequellen anzupassen.",
+      "dass Walkadaver die eigentliche Ursache für das Entstehen neuer Schlote sind.",
+      "eine vollständige Isolation der Larven von jeglichen Meeresströmungen."
+    ],
+    correct:1 },
+
+  { stem:"Welche der folgenden Überschriften passt inhaltlich zu Absatz 6?",
+    options:[
+      "Die Bedrohung der Jupitermonde durch irdische Bakterien",
+      "Warum die Astrobiologie die Tiefseeforschung behindert",
+      "Tiefsee-Erkenntnisse als Schlüssel für die Suche nach außerirdischem Leben",
+      "Der Einfluss der Erdwärme auf die Eispanzer weit entfernter Planeten"
+    ],
+    correct:2 },
+
+  { stem:"Hauptanliegen des Textes ist es,",
+    options:[
+      "die technischen Errungenschaften moderner Tauchboote zu würdigen.",
+      "über die Entdeckung und Funktionsweise vom Licht unabhängiger Ökosysteme zu informieren.",
+      "den evolutionären Nutzen der Symbiose zwischen Würmern und Krabben zu erklären.",
+      "vor den Gefahren von giftigem Schwefelwasserstoff im Ozean zu warnen."
+    ],
+    correct:1 }
+
+];
+/* ============================================================ */
+
+let userAnswers = new Array(questions.length).fill(null);
+let timeLeft = 910;
+let timerInterval;
+let fontSize = 15;
+let markingOn = false;
+const letters = ['a','b','c','d'];
+
+function changeFontSize(delta){
+  fontSize = Math.min(22, Math.max(11, fontSize + delta));
+
+  document.getElementById('textpanel').style.fontSize = fontSize + 'px';
+}
+
+function toggleMarking(){
+  markingOn = !markingOn;
+  const btn = document.getElementById('markBtn');
+  const tp = document.getElementById('textpanel');
+  btn.classList.toggle('active', markingOn);
+  tp.classList.toggle('marking', markingOn);
+}
+
+function handleTextpanelMouseUp(){
+  if(!markingOn) return;
+  const sel = window.getSelection();
+  if(!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  const tp = document.getElementById('textpanel');
+  const allowed =
+  document.getElementById('textpanel').contains(range.commonAncestorContainer) ||
+  document.getElementById('qpanel').contains(range.commonAncestorContainer);
+
+if(!allowed) return;
+  if(range.toString().trim() === '') { sel.removeAllRanges(); return; }
+  try{
+    const mark = document.createElement('mark');
+    mark.className = 'hl';
+    range.surroundContents(mark);
+  }catch(e){
+    // selection crosses element boundaries; skip silently
+  }
+  sel.removeAllRanges();
+}
+
+
+function handleTextpanelClick(e){
+  const mark = e.target.closest('mark.hl');
+  if(mark){
+    const parent = mark.parentNode;
+    while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+    parent.removeChild(mark);
+    parent.normalize();
+  }
+}
+
+function buildExercise(){
+  const tp = document.getElementById('textpanel');
+  tp.innerHTML = `<h3>${textTitle}</h3>` +
+  paragraphs.map((p,i)=>
+    `<p class="paragraph-${i}">
+      <span class="pnum">(${i+1})</span> ${p}
+    </p>`
+  ).join('');
+  fontSize = 15;
+  tp.style.fontSize = fontSize + 'px';
+  markingOn = false;
+  document.getElementById('markBtn').classList.remove('active');
+  tp.classList.remove('marking');
+  tp.onmouseup = handleTextpanelMouseUp;
+  document.getElementById('qpanel').onmouseup = handleTextpanelMouseUp;
+  tp.onclick = handleTextpanelClick;
+  
+  const qp = document.getElementById('qpanel');
+  qp.innerHTML = '';
+  userAnswers = new Array(questions.length).fill(null);
+
+  questions.forEach((q, qi)=>{
+    const row = document.createElement('div');
+    row.className = 'qrow';
+
+    const head = document.createElement('div');
+    head.className = 'qhead';
+    head.innerHTML = `<span><b>Frage ${qi+1}:</b> ${q.stem}</span><span>▾</span>`;
+    head.onclick = ()=> toggleBody(qi);
+
+    const body = document.createElement('div');
+    body.className = 'qbody';
+    body.id = 'qbody-'+qi;
+
+    q.options.forEach((opt, oi)=>{
+  const b = document.createElement('div');
+
+  b.className = 'option';
+
+  b.innerHTML =
+    `<span class="option-letter">${letters[oi]})</span> ${opt}`;
+
+  b.onclick = ()=> selectOption(qi, oi);
+
+  body.appendChild(b);
+});
+
+    row.appendChild(head);
+    row.appendChild(body);
+    qp.appendChild(row);
+  });
+
+  document.getElementById('result').textContent = '';
+  startTimer();
+}
+
+function toggleBody(qi){
+
+  // Alle anderen Fragen schließen
+  document.querySelectorAll('.qbody').forEach((body, i) => {
+    if(i !== qi){
+      body.classList.remove('open');
+    }
+  });
+
+  // Nur die angeklickte Frage öffnen
+  const body = document.getElementById('qbody-' + qi);
+  body.classList.toggle('open');
+
+  // Zum passenden Absatz springen
+  const paragraph = document.querySelector(
+    '#textpanel .paragraph-' + qi
+  );
+
+  if(paragraph){
+    paragraph.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+    // Absatz hervorheben
+    document.querySelectorAll('#textpanel p').forEach(p => {
+      p.classList.remove('focus-paragraph');
+    });
+
+    paragraph.classList.add('focus-paragraph');
+  }
+}
+
+function selectOption(qi, oi){
+  userAnswers[qi] = oi;
+  const body = document.getElementById('qbody-'+qi);
+  [...body.children].forEach((btn, i)=>{
+    btn.classList.toggle('selected', i===oi);
+  });
+  const heads = document.querySelectorAll('.qhead');
+  heads[qi].classList.add('answered');
+}
+
+function saveAT3AndGoToNext(){
+  let score = 0;
+
+  questions.forEach((q, qi)=>{
+    if(userAnswers[qi] === q.correct){
+      score++;
+    }
+  });
+
+  localStorage.setItem("Lesen_AT3.4", score);
+
+  window.location.href = "Lesen_AT4.4.html";
+}
+
+function checkAnswers(){
+  clearInterval(timerInterval);
+  let score = 0;
+  questions.forEach((q, qi)=>{
+    const body = document.getElementById('qbody-'+qi);
+    [...body.children].forEach((btn, oi)=>{
+      btn.classList.remove('selected');
+      if(oi === q.correct) btn.classList.add('correct');
+      else if(oi === userAnswers[qi]) btn.classList.add('wrong');
+    });
+    body.classList.add('open');
+    if(userAnswers[qi] === q.correct) score++;
+  });
+  const resultEl = document.getElementById('result');
+
+  resultEl.style.color = score === questions.length ? 'green' : 'var(--accent)';
+  resultEl.textContent = `Ergebnis: ${score} von ${questions.length} richtig.`;
+}
+
+function resetExercise(){
+  clearInterval(timerInterval);
+  timeLeft = 910;
+  buildExercise();
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = 910;
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    updateTimerDisplay();
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      checkAnswers();
+    }
+  },1000);
+}
+
+function updateTimerDisplay(){
+  const m = String(Math.floor(timeLeft/60)).padStart(2,'0');
+  const s = String(timeLeft%60).padStart(2,'0');
+  document.getElementById('timer').textContent = `${m}:${s}`;
+}
+
+buildExercise();
+</script>
+
+</body>
+</html>
