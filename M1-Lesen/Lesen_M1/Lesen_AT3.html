@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>TestDaF Übung – Text &amp; Fragen</title>
+<style>
+  :root{
+    --primary:#0e6e8c;
+    --accent:#c8102e;
+    --bg-box:#dde3e8;
+    --border:#0e6e8c;
+  }
+  *{box-sizing:border-box; font-family: Arial, Helvetica, sans-serif;}
+  body{margin:0; padding:20px; background:#f4f6f7; color:#222;}
+  .header{background:var(--primary); color:#fff; padding:14px 20px; font-size:22px; font-weight:bold; border-radius:4px 4px 0 0;}
+  .instructions{background:#eaf1f4; padding:16px 20px; font-size:14px; line-height:1.5;}
+  .timer{display:inline-block; border:2px solid var(--primary); border-radius:50%; width:70px; height:70px; text-align:center; line-height:70px; font-weight:bold; color:var(--primary); margin-top:10px;}
+  .toolbar{display:flex; justify-content:flex-end; gap:8px; padding:10px 20px 0 20px; background:#fff;}
+  .toolbtn{width:38px; height:38px; border:1px solid var(--primary); background:#fff; color:var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px;}
+  .toolbtn.small{font-size:12px;}
+  .toolbtn.big{font-size:16px;}
+  .toolbtn.active{background:var(--primary); color:#fff;}
+  .main{display:flex; gap:16px; padding:10px 20px 20px 20px; background:#fff;}
+  .textpanel{flex:1; max-height:600px; overflow-y:auto; padding-right:10px; border-right:1px solid #ccc; font: size 15px; line-height:1.6;}
+  .textpanel h3{color:var(--primary);}
+  .textpanel p{margin-bottom:16px;}
+  .textpanel .pnum{font-weight:bold; color:var(--primary);}
+  .textpanel mark.hl{background:#fdea63; cursor:pointer; border-radius:2px;}
+  .textpanel.marking{cursor:text;}
+  .qpanel{flex:1.2;}
+  .qrow{background:var(--bg-box); border:1px solid #aab; border-radius:4px; margin-bottom:10px; overflow:hidden;}
+  .qhead{padding:10px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size: 14px;}
+  .qhead b{color:var(--primary); margin-right:6px;}
+  .qhead.answered{background:#eef3f5;}
+  .qbody{display:none; padding:8px 14px 14px 14px; background:#fff;}
+  .qbody.open{display:block;}
+  .option{display:block; width:100%; text-align:left; padding:8px 10px; margin:4px 0; border:1px solid #bbb; border-radius:4px; background:#fdfdfd; cursor:pointer; user-select:text; font-size:15px;}
+  .option.selected{border-color:var(--primary); background:#dceaf0;}
+  .option.correct{border-color:green; background:#e3f7e3;}
+  .option.wrong{border-color:var(--accent); background:#fbe4e7;}
+  .option,
+.option * {
+    font-size: 15px !important;
+}
+
+.option{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:8px 10px;
+    margin:4px 0;
+    border:1px solid #bbb;
+    border-radius:4px;
+    background:#fdfdfd;
+    cursor:pointer;
+    user-select:text;
+    font-size:15px;
+}
+  .footer{display:flex; justify-content:flex-end; gap:10px; padding:16px 20px;}
+  button{background:var(--accent); color:#fff;; border:none; padding:10px 20px; border-radius:4px; font-size:15px; cursor:pointer;}
+  button.secondary{background:#888;}
+  #result{padding:0 20px 20px; font-weight:bold;}
+  </style>
+</head>
+<body>
+
+<div class="header">LESEN – Aufgabe: Text &amp; Fragen</div>
+
+<div class="instructions">
+  Lesen Sie den Text.<br>
+  <strong>Beantworten Sie die Fragen 1–7.</strong><br>
+  Klicken Sie die Fragen an und entscheiden Sie, welche Lösung passt.<br>
+  Für jede Frage gibt es genau eine richtige Lösung.
+  <div class="timer" id="timer">15:00</div>
+</div>
+
+<div class="toolbar">
+  <button class="toolbtn small" onclick="changeFontSize(-1)" title="Verkleinern">A-</button>
+  <button class="toolbtn big" onclick="changeFontSize(1)" title="Vergrößern">A+</button>
+  <button class="toolbtn" id="markBtn" onclick="toggleMarking()" title="Markieren">✎</button>
+</div>
+
+<div class="main">
+  <div class="textpanel" id="textpanel"></div>
+  <div class="qpanel" id="qpanel"></div>
+</div>
+
+<div id="result"></div>
+
+<div class="footer">
+
+  <button class="action secondary" onclick="resetExercise()">
+    Zurücksetzen
+  </button>
+
+  <button class="action" onclick="checkAnswers()">
+    Prüfen
+  </button>
+
+  <button class="action" onclick="saveAT3AndGoToNext()">
+  Aufgabe 4
+</button>
+
+</div>
+
+<script>
+/* ============================================================
+   HIER ANPASSEN: Neue Übung = Titel, Absätze und Fragen ersetzen.
+   correct = Index (0=a, 1=b, 2=c, 3=d)
+   ============================================================ */
+const textTitle = "Das Mikrobiom – ein unsichtbares Ökosystem";
+
+const paragraphs = [
+"Im menschlichen Körper leben Billionen von Mikroorganismen. Die meisten von ihnen befinden sich im Darm und bilden dort eine komplexe Gemeinschaft aus Bakterien, Pilzen und anderen Mikroorganismen. Lange Zeit wurden diese Lebewesen vor allem als potenzielle Krankheitserreger betrachtet. Erst in den vergangenen Jahrzehnten setzte sich zunehmend die Erkenntnis durch, dass viele Mikroorganismen für den Menschen sogar nützlich sind. Die Gesamtheit dieser Mikroorganismen und ihrer Gene wird als Mikrobiom bezeichnet. Es steht in engem Austausch mit dem menschlichen Körper und beeinflusst unter anderem die Verdauung und die Aufnahme bestimmter Nährstoffe.",
+"Besonders intensiv erforscht wird inzwischen die Verbindung zwischen Darm und Immunsystem. Ein großer Teil der Immunabwehr befindet sich im Darm, wo der Körper ständig zwischen nützlichen und schädlichen Stoffen unterscheiden muss. Die dort lebenden Mikroorganismen können dabei eine wichtige Rolle spielen. Sie produzieren beispielsweise Stoffwechselprodukte, die mit Zellen des Immunsystems interagieren. Wissenschaftler gehen deshalb davon aus, dass die Zusammensetzung des Mikrobioms Einfluss darauf haben kann, wie der Körper auf bestimmte Krankheitserreger reagiert. Allerdings ist noch nicht vollständig geklärt, welche Mikroorganismen für welche Prozesse verantwortlich sind.",
+"Die Zusammensetzung des Mikrobioms unterscheidet sich von Mensch zu Mensch erheblich. Dabei spielen unter anderem Ernährung, Alter, Umwelt und die Einnahme von Medikamenten eine Rolle. Auch Antibiotika können die Vielfalt der Darmbakterien vorübergehend deutlich verringern. Das bedeutet jedoch nicht zwangsläufig, dass sich das Mikrobiom dauerhaft verändert. In vielen Fällen kann sich die ursprüngliche Zusammensetzung zumindest teilweise wiederherstellen. Wie schnell und vollständig dieser Prozess verläuft, hängt allerdings von verschiedenen Faktoren ab und ist noch Gegenstand aktueller Forschung.",
+"Aus den Erkenntnissen über das Mikrobiom entstand die Hoffnung, bestimmte Krankheiten künftig gezielter behandeln zu können. Eine Methode, die dabei Aufmerksamkeit erregt hat, ist die sogenannte Stuhltransplantation. Dabei werden Mikroorganismen aus dem Darm eines gesunden Menschen auf einen erkrankten Menschen übertragen. Bei bestimmten schweren Darminfektionen konnte mit dieser Methode bereits eine hohe Erfolgsrate erzielt werden. Daraus lässt sich jedoch nicht ableiten, dass eine solche Behandlung für jede Erkrankung geeignet ist. Bei vielen anderen Krankheiten befindet sich die Forschung noch in einer frühen Phase.",
+"Auch kommerzielle Anbieter haben das wachsende Interesse am Mikrobiom erkannt. Im Internet werden zahlreiche Produkte angeboten, die eine Verbesserung der Darmgesundheit oder sogar eine Vorbeugung gegen Krankheiten versprechen. Dazu gehören Probiotika, spezielle Nahrungsergänzungsmittel und individuell zusammengestellte Ernährungsprogramme. Die wissenschaftliche Beweislage ist allerdings nicht für alle dieser Angebote gleichermaßen überzeugend. Dass ein Produkt bestimmte Bakterienstämme enthält, bedeutet beispielsweise nicht automatisch, dass es bei jedem Menschen denselben Effekt erzielt. Die individuelle Zusammensetzung des Mikrobioms macht allgemeingültige Empfehlungen schwierig.",
+"Eine besonders interessante Entwicklung ist deshalb die sogenannte personalisierte Medizin. Statt allen Menschen dieselbe Behandlung zu empfehlen, könnten Ärzte künftig stärker berücksichtigen, welche Mikroorganismen bei einem Patienten vorhanden sind. Denkbar wäre beispielsweise, Ernährung oder Medikamente gezielt an die individuelle Zusammensetzung des Mikrobioms anzupassen. Bis dahin sind jedoch noch zahlreiche Fragen zu klären. Vor allem muss genauer verstanden werden, ob bestimmte Veränderungen des Mikrobioms tatsächlich Krankheiten verursachen oder lediglich mit ihnen zusammen auftreten. Eine solche Unterscheidung ist entscheidend, bevor daraus neue Therapien entwickelt werden können."
+];
+
+const questions = [
+  { stem:"Was wird in Absatz 1 über das Mikrobiom gesagt?",
+    options:["Es besteht ausschließlich aus Krankheitserregern.","Es steht in Wechselwirkung mit dem menschlichen Körper.","Es befindet sich hauptsächlich außerhalb des menschlichen Körpers.","Es beeinflusst vor allem die Funktion des Immunsystems."],
+    correct:1 },
+  { stem:"Welche Funktion des Mikrobioms wird in Absatz 2 beschrieben?",
+    options:["Es verhindert grundsätzlich Infektionen.","Es ersetzt einen Teil der Immunabwehr.","Es kann die Reaktion des Körpers beeinflussen.","Es sorgt für eine gleichmäßige Zusammensetzung des Immunsystems."],
+    correct:2 },
+  { stem:"Welche der folgenden Überschriften passt zu Absatz 3?",
+    options:["Faktoren, die das Mikrobiom beeinflussen","Die dauerhaften Folgen einer Antibiotikabehandlung","Unterschiede zwischen menschlichen Immunsystemen","Möglichkeiten zur künstlichen Veränderung von Bakterien"],
+    correct:0 },
+  { stem:"Was lässt sich laut Absatz 4 über die Stuhltransplantation sagen?",
+    options:["Sie wird inzwischen gegen zahlreiche Krankheiten eingesetzt.","Ihre Wirkung ist bei bestimmten Erkrankungen nachgewiesen.","Sie führt bei den meisten Patienten zu einer dauerhaften Heilung.","Ihre Wirksamkeit hängt ausschließlich vom Spender ab."],
+    correct:1 },
+  { stem:"Welche Aussage fasst den Inhalt von Absatz 5 korrekt zusammen?",
+    options:["Die Wirkung von Produkten für das Mikrobiom ist wissenschaftlich eindeutig belegt.","Individuelle Unterschiede erschweren allgemeine Aussagen über solche Produkte.","Nahrungsergänzungsmittel sind wirksamer als eine Veränderung der Ernährung.","Die meisten kommerziellen Angebote richten sich an Menschen mit Darmerkrankungen."],
+    correct:1 },
+  { stem:"Welche Frage ist laut Absatz 6 für die zukünftige Forschung besonders wichtig?",
+    options:["Wie viele Mikroorganismen ein Mensch benötigt","Ob Veränderungen des Mikrobioms Ursache oder Folge einer Krankheit sind","Welche Medikamente das Mikrobiom vollständig verändern können","Ob alle Menschen dasselbe Mikrobiom entwickeln können"],
+    correct:1 },
+  { stem:"Was ist das Hauptanliegen des Textes?",
+    options:["Die Entwicklung neuer Therapien auf Grundlage des Mikrobioms zu erklären","Die wichtigsten medizinischen Einsatzmöglichkeiten des Mikrobioms vorzustellen","Chancen und Grenzen der aktuellen Mikrobiomforschung darzustellen","Vor kommerziellen Produkten zur Verbesserung des Mikrobioms zu warnen"],
+    correct:2 }
+];
+/* ============================================================ */
+
+let userAnswers = new Array(questions.length).fill(null);
+let timeLeft = 900;
+let timerInterval;
+let fontSize = 16;
+let markingOn = false;
+const letters = ['a','b','c','d'];
+
+function changeFontSize(delta){
+  fontSize = Math.min(22, Math.max(11, fontSize + delta));
+
+  document.getElementById('textpanel').style.fontSize = fontSize + 'px';
+  document.getElementById('qpanel').style.fontSize = fontSize + 'px';
+}
+
+function toggleMarking(){
+  markingOn = !markingOn;
+  const btn = document.getElementById('markBtn');
+  const tp = document.getElementById('textpanel');
+  btn.classList.toggle('active', markingOn);
+  tp.classList.toggle('marking', markingOn);
+}
+
+function handleTextpanelMouseUp(){
+  if(!markingOn) return;
+  const sel = window.getSelection();
+  if(!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  const tp = document.getElementById('textpanel');
+  const allowed =
+  document.getElementById('textpanel').contains(range.commonAncestorContainer) ||
+  document.getElementById('qpanel').contains(range.commonAncestorContainer);
+
+if(!allowed) return;
+  if(range.toString().trim() === '') { sel.removeAllRanges(); return; }
+  try{
+    const mark = document.createElement('mark');
+    mark.className = 'hl';
+    range.surroundContents(mark);
+  }catch(e){
+    // selection crosses element boundaries; skip silently
+  }
+  sel.removeAllRanges();
+}
+
+
+function handleTextpanelClick(e){
+  const mark = e.target.closest('mark.hl');
+  if(mark){
+    const parent = mark.parentNode;
+    while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+    parent.removeChild(mark);
+    parent.normalize();
+  }
+}
+
+function buildExercise(){
+  const tp = document.getElementById('textpanel');
+  tp.innerHTML = `<h3>${textTitle}</h3>` +
+  paragraphs.map((p,i)=>
+    `<p class="paragraph-${i}">
+      <span class="pnum">(${i+1})</span> ${p}
+    </p>`
+  ).join('');
+  fontSize = 15;
+  tp.style.fontSize = fontSize + 'px';
+  markingOn = false;
+  document.getElementById('markBtn').classList.remove('active');
+  tp.classList.remove('marking');
+  tp.onmouseup = handleTextpanelMouseUp;
+  document.getElementById('qpanel').onmouseup = handleTextpanelMouseUp;
+  tp.onclick = handleTextpanelClick;
+  
+  const qp = document.getElementById('qpanel');
+  qp.innerHTML = '';
+  userAnswers = new Array(questions.length).fill(null);
+
+  questions.forEach((q, qi)=>{
+    const row = document.createElement('div');
+    row.className = 'qrow';
+
+    const head = document.createElement('div');
+    head.className = 'qhead';
+    head.innerHTML = `<span><b>Frage ${qi+1}:</b> ${q.stem}</span><span>▾</span>`;
+    head.onclick = ()=> toggleBody(qi);
+
+    const body = document.createElement('div');
+    body.className = 'qbody';
+    body.id = 'qbody-'+qi;
+
+    q.options.forEach((opt, oi)=>{
+  const b = document.createElement('div');
+
+  b.className = 'option';
+
+  b.innerHTML =
+    `<span class="option-letter">${letters[oi]})</span> ${opt}`;
+
+  b.onclick = ()=> selectOption(qi, oi);
+
+  body.appendChild(b);
+});
+
+    row.appendChild(head);
+    row.appendChild(body);
+    qp.appendChild(row);
+  });
+
+  document.getElementById('result').textContent = '';
+  startTimer();
+}
+
+function toggleBody(qi){
+
+  // Alle anderen Fragen schließen
+  document.querySelectorAll('.qbody').forEach((body, i) => {
+    if(i !== qi){
+      body.classList.remove('open');
+    }
+  });
+
+  // Nur die angeklickte Frage öffnen
+  const body = document.getElementById('qbody-' + qi);
+  body.classList.toggle('open');
+
+  // Zum passenden Absatz springen
+  const paragraph = document.querySelector(
+    '#textpanel .paragraph-' + qi
+  );
+
+  if(paragraph){
+    paragraph.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+    // Absatz hervorheben
+    document.querySelectorAll('#textpanel p').forEach(p => {
+      p.classList.remove('focus-paragraph');
+    });
+
+    paragraph.classList.add('focus-paragraph');
+  }
+}
+
+function selectOption(qi, oi){
+  userAnswers[qi] = oi;
+  const body = document.getElementById('qbody-'+qi);
+  [...body.children].forEach((btn, i)=>{
+    btn.classList.toggle('selected', i===oi);
+  });
+  const heads = document.querySelectorAll('.qhead');
+  heads[qi].classList.add('answered');
+}
+
+function saveAT3AndGoToNext(){
+  let score = 0;
+
+  questions.forEach((q, qi)=>{
+    if(userAnswers[qi] === q.correct){
+      score++;
+    }
+  });
+
+  localStorage.setItem("Lesen_AT3", score);
+
+  window.location.href = "Lesen_AT4.html";
+}
+
+function checkAnswers(){
+  clearInterval(timerInterval);
+  let score = 0;
+  questions.forEach((q, qi)=>{
+    const body = document.getElementById('qbody-'+qi);
+    [...body.children].forEach((btn, oi)=>{
+      btn.classList.remove('selected');
+      if(oi === q.correct) btn.classList.add('correct');
+      else if(oi === userAnswers[qi]) btn.classList.add('wrong');
+    });
+    body.classList.add('open');
+    if(userAnswers[qi] === q.correct) score++;
+  });
+  const resultEl = document.getElementById('result');
+
+  resultEl.style.color = score === questions.length ? 'green' : 'var(--accent)';
+  resultEl.textContent = `Ergebnis: ${score} von ${questions.length} richtig.`;
+}
+
+function resetExercise(){
+  clearInterval(timerInterval);
+  timeLeft = 900;
+  buildExercise();
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = 900;
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    updateTimerDisplay();
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      checkAnswers();
+    }
+  },1000);
+}
+
+function updateTimerDisplay(){
+  const m = String(Math.floor(timeLeft/60)).padStart(2,'0');
+  const s = String(timeLeft%60).padStart(2,'0');
+  document.getElementById('timer').textContent = `${m}:${s}`;
+}
+
+buildExercise();
+</script>
+
+</body>
+</html>
