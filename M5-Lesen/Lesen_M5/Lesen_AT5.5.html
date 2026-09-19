@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>TestDaF Übung – Aussagen zuordnen</title>
+<style>
+  :root{
+    --primary:#0e6e8c;
+    --accent:#c8102e;
+  }
+  *{box-sizing:border-box; font-family: Arial, Helvetica, sans-serif;}
+  body{margin:0; padding:20px; background:#f4f6f7; color:#222;}
+  .header{background:var(--primary); color:#fff; padding:14px 20px; font-size:22px; font-weight:bold; border-radius:4px 4px 0 0;}
+  .instructions{background:#eaf1f4; padding:16px 20px; font-size:15px; line-height:1.5;}
+  .timer{display:inline-block; border:2px solid var(--primary); border-radius:50%; width:70px; height:70px; text-align:center; line-height:70px; font-weight:bold; color:var(--primary); margin-top:10px;}
+  .toolbar{display:flex; justify-content:flex-end; gap:8px; padding:10px 20px 0 20px; background:#fff;}
+  .toolbtn{width:38px; height:38px; border:1px solid var(--primary); background:#fff; color:var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px;}
+  .toolbtn.small{font-size:12px;}
+  .toolbtn.big{font-size:18px;}
+  .toolbtn.active{background:var(--primary); color:#fff;}
+  .main{display:flex; gap:24px; padding:10px 20px 20px 20px; background:#fff;}
+  .textpanel{flex:1; max-height:600px; overflow-y:auto; padding-right:10px; border-right:1px solid #ccc; font-size:15px; line-height:1.6;}
+  .textpanel h3{color:var(--primary);}
+  .textpanel p{margin-bottom:14px;}
+  mark.hl{
+    background:#fdea63;
+    cursor:pointer;
+    border-radius:2px;
+}
+  .tablepanel{flex:1.4;}
+  table{width:100%; border-collapse:collapse; font-size:15px;}
+  th{text-align:center; padding:8px 6px; background:#f0f3f5; border-bottom:2px solid var(--primary); color:var(--primary);}
+  td{text-align:center; padding:10px 6px; border-bottom:1px solid #ddd;}
+  td.stmt{text-align:left; font-weight:normal;}
+  tr:nth-child(even) td{background:#f7f9fa;}
+  input[type=radio]{width:16px; height:16px; cursor:pointer;}
+  td.correct{background:#e3f7e3 !important;}
+  td.wrong{background:#fbe4e7 !important;}
+  .footer{display:flex; justify-content:flex-end; gap:10px; padding:16px 20px;}
+  button.action{background:var(--accent); color:#fff; border:none; padding:10px 20px; border-radius:4px; font-size:15px; cursor:pointer;}
+  button.action.secondary{background:#888;}
+  #result{padding:0 20px 20px; font-weight:bold;}
+  .textpanel mark.hl{
+    background:#fdea63;
+    cursor:pointer;
+    border-radius:2px;
+}
+
+th.markable{
+    cursor:text;
+}
+</style>
+</head>
+<body>
+
+<div class="header">LESEN – Aufgabentyp 5: Aussagen zuordnen</div>
+
+<div class="instructions">
+  Lesen Sie den Text.<br>
+  <strong>Ordnen Sie die Aussagen 1–7 zu.</strong> Entscheiden Sie für jede Aussage, welcher Kategorie sie entspricht.<br>
+  Es kann auch sein, dass einzelne Aussagen gar nicht passen.<br>
+  Für jede Aussage gibt es genau eine richtige Lösung.
+  <div class="timer" id="timer">09:10</div>
+</div>
+
+<div class="toolbar">
+  <button class="toolbtn small" onclick="changeFontSize(-1)" title="Verkleinern">A-</button>
+  <button class="toolbtn big" onclick="changeFontSize(1)" title="Vergrößern">A+</button>
+  <button class="toolbtn" id="markBtn" onclick="toggleMarking()" title="Markieren">✎</button>
+</div>
+
+<div class="main">
+  <div class="textpanel" id="textpanel"></div>
+  <div class="tablepanel" id="tablepanel"></div>
+</div>
+
+<div class="footer">
+
+  <button class="action secondary" onclick="resetExercise()">
+    Zurücksetzen
+  </button>
+
+  <button class="action" onclick="checkAnswers()">
+    Prüfen
+  </button>
+
+  <button class="action" onclick="saveAT5AndGoToNext()">Weiter</button>
+</div>
+<div id="result"></div>
+
+<script>
+/* ============================================================
+   HIER ANPASSEN: Titel, Absätze, Spalten (Kategorien) und
+   Aussagen mit dem Index der richtigen Kategorie (0-basiert,
+   entsprechend der Reihenfolge in "columns").
+   ============================================================ */
+const textTitle = "Das menschliche Zeitempfinden – Kognitive Mechanismen und chronobiologische Faktoren";
+
+const paragraphs = [
+"Die wissenschaftliche Erforschung der temporalen Wahrnehmung offenbart eine faszinierende Diskrepanz innerhalb der menschlichen Realität, bei der die exakte physikalische Dimension und die psychologische Verarbeitung von Zeitdauer aufeinandertreffen. Im Zentrum dieser interdisziplinären Analysen stehen zwei grundlegend verschiedene Konzepte der Zeiterfassung: das hochflexible, subjektive Zeitempfinden des Individuums sowie die starre, objektive Zeitmessung durch technologische Apparaturen. Obwohl beide Formen der zeitlichen Orientierung fundamental darauf basieren, chronologische Abläufe in messbare oder erfahrbare Intervalle zu unterteilen, um dem menschlichen Handeln eine notwendige Struktur und Koordination zu verleihen, zeigen sich in ihrer Funktionsweise, neuronalen Verankerung und Stabilität tiefgreifende Unterschiede.",
+
+"Die objektive Zeitmessung, die primär auf standardisierten, mechanischen oder atomaren Taktgebern beruht und als globaler Bezugspunkt für gesellschaftliche Prozesse dient, ist durch eine absolute Invarianz gekennzeichnet. Bei diesem System sind die Intervalle – Sekunden, Minuten und Stunden – mathematisch exakt definiert und vollkommen unabhängig von äußeren Umweltreizen oder inneren Gefühlszuständen. Diese mathematische Konstanz sorgt dafür, dass eine Stunde unter allen messbaren Bedingungen exakt die gleiche physikalische Länge aufweist. Ein inhärenter Nachteil dieses rigiden Systems zeigt sich jedoch in seiner Unfähigkeit, sich an biologische Rhythmen anzupassen. Trotz der exakten Taktung führt die strikte Orientierung an Uhren in modernen Gesellschaften häufig zu einer Entkopplung des Menschen von seinen natürlichen Schlaf-Wach-Phasen, da physikalische Zeiteinheiten keine Rücksicht auf die individuelle Chronobiologie nehmen können.",
+
+"Ein diametral entgegengesetztes Prinzip kennzeichnet das subjektive Zeitempfinden, dessen Dynamik primär auf kognitiven Verarbeitungsprozessen und der Dichte erlebter Emotionen basiert. Da diese Form der Wahrnehmung nicht durch starre Taktgeber gesteuert wird, sondern durch die Anzahl der im Gehirn abgespeicherten Reize und neuronalen Impulse, ist die gefühlte Dauer von Momenten extrem variabel. Während eine monotone, ereignisarme Situation in der Retrospektive oft als extrem kurz wahrgenommen wird, führt eine hohe Dichte an neuen Erfahrungen zu einer gefühlten Dehnung der Zeit. Aufgrund dieser enormen Variabilität und Abhängigkeit von der psychischen Verfassung ist das subjektive Empfinden für die präzise Taktung globaler Wirtschaftsprozesse oder Fahrpläne gänzlich ungeeignet. Ein entscheidender evolutionärer Pluspunkt dieser kognitiven Zeitflexibilität ist jedoch ihre adaptive Funktion: In akuten Gefahrensituationen schaltet das Gehirn in einen Zustand der Hyperfokussierung, wodurch die Zeit subjektiv drastisch verlangsamt abläuft, was dem Individuum in Bruchteilen von Sekunden lebenswichtige Reaktionszeit verschafft.",
+];
+
+const columns = ["subjektiv", "objektiv", "beide", "passt nicht"];
+
+const statements = [
+  { text: "Dieses System der Zeiterfassung zeichnet sich durch eine absolute, von Gefühlen unabhängige mathematische Konstanz aus.", correct: 1 },
+  { text: "Die Wahrnehmung der Zeitdauer variiert hierbei stark in Abhängigkeit von der Dichte der erlebten Reize und Emotionen.", correct: 0 },
+  { text: "Dieses Konzept dient dem Menschen grundlegend dazu, chronologische Abläufe zu strukturieren und Handlungen zu koordinieren.", correct: 2 },
+  { text: "In existenziellen Gefahrensituationen ermöglicht diese Form der Zeiterfassung eine lebenswichtige, gefühlte Zeitdehnung.", correct: 0 },
+  { text: "Das System führt in modernen Gesellschaften aufgrund seiner Rigidität häufig zu Konflikten mit der körpereigenen Chronobiologie.", correct: 1 },
+  { text: "Die exakte Erfassung der Intervalle erfolgt bei dieser Methode primär durch das Zählen von Herzschlägen während der Tiefschlafphase.", correct: 3 },
+  { text: "Aufgrund seiner extremen Variabilität ist dieses Prinzip für die präzise Koordination globaler Wirtschaftsprozesse ungeeignet.", correct: 0 }
+];
+
+/* ============================================================ */
+
+let timeLeft = 550;
+let timerInterval;
+let fontSize = 15;
+let markingOn = false;
+
+function buildExercise(){
+  const tp = document.getElementById('textpanel');
+  tp.innerHTML = `<h3>${textTitle}</h3>` + paragraphs.map(p=>`<p>${p}</p>`).join('');
+  tp.onmouseup = handleTextpanelMouseUp;
+document.getElementById('tablepanel').onmouseup = handleTextpanelMouseUp;
+  fontSize = 15;
+  tp.style.fontSize = fontSize + 'px';
+  markingOn = false;
+  document.getElementById('markBtn').classList.remove('active');
+
+  const container = document.getElementById('tablepanel');
+  let html = '<table><thead><tr><th style="text-align:left;">Nr.</th><th style="text-align:left;">Aussage</th>';
+  columns.forEach((c, ci)=> {
+    html += `<th class="${ci < 2 ? 'markable' : ''}">${c}</th>`;
+});
+  html += '</tr></thead><tbody>';
+  statements.forEach((s, si)=>{
+    html += `<tr><td>${si+1}</td><td class="stmt">${s.text}</td>`;
+    columns.forEach((c, ci)=>{
+      html += `<td id="cell-${si}-${ci}"><input type="radio" name="q${si}" value="${ci}" onclick="selectAnswer(${si})"></td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+
+  document.getElementById('result').textContent = '';
+  startTimer();
+}
+
+function selectAnswer(si){
+  // clear previous highlight state for this row (in case user changes answer after checking)
+  document.querySelectorAll(`td[id^="cell-${si}-"]`).forEach(td=>{
+    td.classList.remove('correct','wrong');
+  });
+}
+
+function saveAT5AndGoToNext(){
+  let score = 0;
+
+  statements.forEach((s, si)=>{
+    const selected = document.querySelector(
+      `input[name="q${si}"]:checked`
+    );
+
+    const selVal = selected ? parseInt(selected.value) : null;
+
+    if(selVal === s.correct){
+      score++;
+    }
+  });
+
+  localStorage.setItem("Lesen_AT5.5", score);
+
+  window.location.href = "Lesen_AT6.5.html";
+}
+
+function checkAnswers(){
+  clearInterval(timerInterval);
+  let score = 0;
+  statements.forEach((s, si)=>{
+    const selected = document.querySelector(`input[name="q${si}"]:checked`);
+    const selVal = selected ? parseInt(selected.value) : null;
+    document.querySelectorAll(`td[id^="cell-${si}-"]`).forEach(td=> td.classList.remove('correct','wrong'));
+    const correctCell = document.getElementById(`cell-${si}-${s.correct}`);
+    if(selVal === s.correct){
+      correctCell.classList.add('correct');
+      score++;
+    } else {
+      correctCell.classList.add('correct');
+      if(selVal !== null){
+        document.getElementById(`cell-${si}-${selVal}`).classList.add('wrong');
+      }
+    }
+  });
+  const resultEl = document.getElementById('result');
+
+  resultEl.style.color = score === statements.length ? 'green' : 'var(--accent)';
+  resultEl.textContent = `Ergebnis: ${score} von ${statements.length} richtig.`;
+}
+
+function resetExercise(){
+  clearInterval(timerInterval);
+  timeLeft = 550;
+  buildExercise();
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = 550;
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    updateTimerDisplay();
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      checkAnswers();
+    }
+  },1000);
+}
+
+function updateTimerDisplay(){
+  const m = String(Math.floor(timeLeft/60)).padStart(2,'0');
+  const s = String(timeLeft%60).padStart(2,'0');
+  document.getElementById('timer').textContent = `${m}:${s}`;
+}
+
+function changeFontSize(delta){
+  fontSize = Math.min(22, Math.max(11, fontSize + delta));
+  document.getElementById('textpanel').style.fontSize = fontSize + 'px';
+}
+
+function toggleMarking(){
+  markingOn = !markingOn;
+  const btn = document.getElementById('markBtn');
+  btn.classList.toggle('active', markingOn);
+}
+
+function handleTextpanelMouseUp(){
+  if(!markingOn) return;
+  const sel = window.getSelection();
+  if(!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  const tp = document.getElementById('textpanel');
+  const allowed =
+    document.getElementById('textpanel').contains(range.commonAncestorContainer) ||
+    document.getElementById('tablepanel').contains(range.commonAncestorContainer);
+if(!allowed) return;
+  if(range.toString().trim() === '') { sel.removeAllRanges(); return; }
+  try{
+    const mark = document.createElement('mark');
+    mark.className = 'hl';
+    range.surroundContents(mark);
+  }catch(e){}
+  sel.removeAllRanges();
+}
+
+document.addEventListener('click', function(e){
+  const mark = e.target.closest('mark.hl');
+  if(mark){
+    const parent = mark.parentNode;
+    while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+    parent.removeChild(mark);
+    parent.normalize();
+  }
+});
+
+buildExercise();
+</script>
+
+</body>
+</html>
