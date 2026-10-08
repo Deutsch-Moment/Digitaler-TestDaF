@@ -19,7 +19,7 @@
   .toolbtn.big{font-size:18px;}
   .toolbtn.active{background:var(--primary); color:#fff;}
   .main{display:flex; gap:24px; padding:10px 20px 20px 20px; background:#fff;}
-  .textpanel{flex:1; max-height:600px; overflow-y:auto; padding-right:10px; border-right:1px solid #ccc; font-size:14px; line-height:1.6;}
+  .textpanel{flex:1; max-height:600px; overflow-y:auto; padding-right:10px; border-right:1px solid #ccc; font-size:15px; line-height:1.6;}
   .textpanel h3{color:var(--primary);}
   .textpanel p{margin-bottom:14px;}
   mark.hl{
@@ -28,7 +28,7 @@
     border-radius:2px;
 }
   .tablepanel{flex:1.4;}
-  table{width:100%; border-collapse:collapse; font-size:13px;}
+  table{width:100%; border-collapse:collapse; font-size:15px;}
   th{text-align:center; padding:8px 6px; background:#f0f3f5; border-bottom:2px solid var(--primary); color:var(--primary);}
   td{text-align:center; padding:10px 6px; border-bottom:1px solid #ddd;}
   td.stmt{text-align:left; font-weight:normal;}
@@ -130,7 +130,7 @@ function buildExercise(){
   tp.innerHTML = `<h3>${textTitle}</h3>` + paragraphs.map(p=>`<p>${p}</p>`).join('');
   tp.onmouseup = handleTextpanelMouseUp;
 document.getElementById('tablepanel').onmouseup = handleTextpanelMouseUp;
-  fontSize = 14;
+  fontSize = 15;
   tp.style.fontSize = fontSize + 'px';
   markingOn = false;
   document.getElementById('markBtn').classList.remove('active');
