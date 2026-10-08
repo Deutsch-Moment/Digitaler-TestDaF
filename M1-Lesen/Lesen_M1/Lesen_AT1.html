@@ -16,7 +16,7 @@
   .timer{display:inline-block; border:2px solid var(--primary); border-radius:50%; width:70px; height:70px; text-align:center; line-height:70px; font-weight:bold; color:var(--primary); margin-top:10px;}
   .toolbar{display:flex; justify-content:flex-end; gap:8px; padding:10px 20px 0 20px; background:#fff;}
   .toolbtn{width:38px; height:38px; border:1px solid var(--primary); background:#fff; color:var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px;}
-  .toolbtn.small{font-size:12px;}
+  .toolbtn.small{font-size:16px;}
   .toolbtn.big{font-size:18px;}
   .toolbtn.active{background:var(--primary); color:#fff;}
   .main{padding:10px 20px 20px 20px; background:#fff;}
@@ -82,22 +82,71 @@
    gaps: Reihenfolge muss zur Nummerierung im Text passen.
    correct = Index der richtigen Option (0=a,1=b,2=c,3=d)
    ============================================================ */
-const textTitle = "Warum erinnern wir uns an manche Gerüche besonders gut?";
+const textTitle = "Neuroökonomie und Entscheidungsverhalten";
 
 const textHTML = `
-<p>Gerüche können Erinnerungen auslösen, die jahrelang zurückliegen. Der Duft eines bestimmten Parfüms oder eines Gerichts reicht manchmal aus, um eine längst vergessene Situation plötzlich wieder lebendig werden zu lassen. Wissenschaftler vermuten, dass dies mit der besonderen Verarbeitung von Geruchsinformationen im Gehirn zusammenhängt. Gerüche [[1]] dabei offenbar einen unmittelbaren Zugang zu Gehirnbereichen, die an der Verarbeitung von Erinnerungen und Emotionen beteiligt sind.</p>
-<p>Interessant ist außerdem, dass Geruchserinnerungen häufig besonders emotional geprägt sind. Während wir uns an einzelne Fakten nur schwer erinnern können, [[2]] sich bestimmte Erlebnisse durch einen vertrauten Geruch überraschend deutlich zurück. Forscher führen dies unter anderem darauf zurück, dass Gerüche eng mit persönlichen Erfahrungen verbunden werden.</p>
-<p>Allerdings lässt sich nicht jeder Geruch gleichermaßen dauerhaft im Gedächtnis [[3]]. Entscheidend scheint vielmehr zu sein, ob eine bestimmte Wahrnehmung mit einem emotional bedeutsamen Erlebnis verbunden ist. Je stärker diese Verbindung ist, desto wahrscheinlicher bleibt die Erinnerung langfristig erhalten.</p>
-<p>Auch bei Menschen mit eingeschränktem Sehvermögen können Gerüche eine besondere Rolle spielen. Sie können dazu beitragen, bestimmte Orte oder Situationen schneller [[4]]. In einer Studie berichteten Teilnehmer beispielsweise, dass sie anhand eines bestimmten Geruchs Orte aus ihrer Kindheit wiedererkennen konnten.</p>
-<p>Die Forschung zu diesem Thema könnte künftig auch für die Medizin interessant werden. Einige Wissenschaftler [[5]] die Möglichkeit, Gerüche gezielt einzusetzen, um positive Erinnerungen hervorzurufen oder bestimmte therapeutische Prozesse zu unterstützen. Ob sich daraus tatsächlich wirksame Behandlungsmethoden entwickeln lassen, ist allerdings noch offen.</p>
+<p>Die Neuroökonomie kombiniert neurowissenschaftliche Methoden mit ökonomischen Theorien, um menschliches Handeln bei finanziellen Risikoentscheidungen zu analysieren. Klassische Wirtschaftsmodelle gingen lange Zeit davon aus, dass Individuen stets rein rational agieren und ihren persönlichen Nutzen maximieren. Experimentelle Untersuchungen mittels funktioneller Magnetresonanztomographie (fMRT) haben diese Annahme jedoch [[1]].</p>
+
+<p>Es zeigte sich, dass emotionale Zentren im Gehirn, insbesondere die Amygdala, bei Verlustangst übermäßig stark aktiviert werden. Dies führt dazu, dass Menschen mathematisch günstige Chancen ablehnen, nur um potenzielle Verluste zu vermeiden. [[2]] die Neurowissenschaften diesen unbewussten Mechanismus detailliert beschreiben können, bleibt umstritten, wie stark emotionale Impulse durch kognitive Kontrolle überschrieben werden können.</p>
+
+<p>In der Praxis nutzen Finanzinstitute diese Erkenntnisse bereits, um Risikoprofile von Anlegern präziser zu erstellen. Eine [[3]] Erfassung neuronaler Prozesse könnte in Zukunft dazu beitragen, fehlerhafte Anlagestrategien frühzeitig zu korrigieren.</p>
+
+<p>Kritiker warnen jedoch vor den ethischen Gefahren dieser Technologie. Wenn Unternehmen das Entscheidungsverhalten von Konsumenten gezielt manipulieren, wird die individuelle Wahlfreiheit [[4]]. Daher fordern Ethiker strenge rechtliche Rahmenbedingungen für die [[5]] neuroökonomischer Daten im kommerziellen Sektor.</p>
+
+
 `;
 
 const gaps = [
-  { options:["eröffnen","erschließen","ermöglichen","vermitteln"], correct:0 },
-  { options:["rufen","stellen","kehren","holen"], correct:2 },
-  { options:["bewahren","speichern","behalten","festhalten"], correct:1 },
-  { options:["zuordnen","erkennen","einordnen","unterscheiden"], correct:0 },
-  { options:["schließen","ziehen","erwägen","vermuten"], correct:2 }
+  {
+    // Verb
+    options: [
+      "widerlegt",
+      "revidiert",
+      "verworfen",
+      "entkräftet"
+    ],
+    correct: 3
+  },
+  {
+    // Verb
+    options: [
+      "Obgleich",
+      "Insofern",
+      "Soweit",
+      "Zumal"
+    ],
+    correct: 0
+  },
+  {
+    // Adjektiv
+    options: [
+      "nuancierte",
+      "punktgenaue",
+      "differenzierte",
+      "akribische"
+    ],
+    correct: 2
+  },
+  {
+    // Nomen
+    options: [
+      "unwillkürlich",
+      "spürbar",
+      "drastisch",
+      "schleichend"
+    ],
+    correct: 3
+  },
+  {
+    // Verb
+    options: [
+      "Verwertung",
+      "Erhebung",
+      "Preisgabe",
+      "Auswertung"
+    ],
+    correct: 0
+  }
 ];
 /* ============================================================ */
 
@@ -183,6 +232,7 @@ function setGapAnswer(idx, oi){
 document.addEventListener('click', closeAnyDropdown);
 
 function saveAndGoToNext(){
+
   let score = 0;
 
   gaps.forEach((g, idx)=>{
@@ -191,7 +241,20 @@ function saveAndGoToNext(){
     }
   });
 
+  // نمره
   localStorage.setItem("Lesen_AT1", score);
+
+  // جواب‌های کاربر
+  localStorage.setItem(
+    "Lesen_AT1_answers",
+    JSON.stringify(userAnswers)
+  );
+
+  // جواب‌های صحیح
+  localStorage.setItem(
+    "Lesen_AT1_correct",
+    JSON.stringify(gaps.map(g => g.correct))
+  );
 
   window.location.href = "Lesen_AT2.html";
 }

@@ -16,7 +16,7 @@
   .timer{display:inline-block; border:2px solid var(--primary); border-radius:50%; width:70px; height:70px; text-align:center; line-height:70px; font-weight:bold; color:var(--primary); margin-top:10px;}
   .toolbar{display:flex; justify-content:flex-end; gap:8px; padding:10px 20px 0 20px; background:#fff;}
   .toolbtn{width:38px; height:38px; border:1px solid var(--primary); background:#fff; color:var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px;}
-  .toolbtn.small{font-size:12px;}
+  .toolbtn.small{font-size:16px;}
   .toolbtn.big{font-size:18px;}
   .toolbtn.active{background:var(--primary); color:#fff;}
   .container{display:flex; flex-direction:column; gap:14px; padding:10px 20px 20px 20px; background:#fff;}
@@ -212,49 +212,19 @@ function onDrop(e, targetSlotId){
 function checkOrder(){
   let score = 0;
   let filledCount = 0;
+  const placed = [];
 
-  textSegments.forEach((_, i)=>{
-    const slotId = 'target-' + i;
-    const el = document.querySelector(`[data-slot="${slotId}"]`);
-
-    el.classList.remove('correct','wrong');
-
-    const val = slotContents[slotId];
+  for(let i = 0; i < textSegments.length; i++){
+    const val = slotContents['target-' + i];
 
     if(val === undefined){
-      return;
+      placed.push(null);
+      continue;
     }
 
     filledCount++;
-
-    // پاراگراف اول نمره ندارد
-    if(i === 0){
-      if(val === 0){
-        el.classList.add('correct');
-      } else {
-        el.classList.add('wrong');
-      }
-      return;
-    }
-
-    // چهار پاراگراف بعدی هر کدام 1 نمره
-    if(val === i){
-
-  score++;
-
-  el.classList.add('correct');
-
-  console.log("RICHTIG:", i, "→", val);
-
-} else {
-
-    el.classList.add('wrong');
-
-    console.log("FALSCH:", i, "→", val);
-
-}
-
-});
+    placed.push(val);
+  }
 
   const resultEl = document.getElementById('result');
 
@@ -265,27 +235,104 @@ function checkOrder(){
     return;
   }
 
+  document.querySelectorAll('.slot').forEach(el=>{
+    el.classList.remove('correct','wrong');
+  });
+
+  /*
+    Es zählt nur die Verbindung zwischen zwei
+    direkt nebeneinander stehenden Abschnitten.
+
+    Die Position der Verbindung ist egal.
+
+    Richtige Verbindungen:
+    0 → 1
+    1 → 2
+    2 → 3
+    3 → 4
+  */
+
+  const correctConnections = new Set([
+    '0->1',
+    '1->2',
+    '2->3',
+    '3->4'
+  ]);
+
+  for(let i = 0; i < placed.length - 1; i++){
+
+    const connection =
+      placed[i] + '->' + placed[i + 1];
+
+    const currentSlot =
+      document.querySelector(`[data-slot="target-${i}"]`);
+
+    if(correctConnections.has(connection)){
+
+      score++;
+
+      if(currentSlot){
+        currentSlot.classList.add('correct');
+      }
+
+    }else{
+
+      if(currentSlot){
+        currentSlot.classList.add('wrong');
+      }
+    }
+  }
+
+  if(score === textSegments.length - 1){
+
+    for(let i = 0; i < textSegments.length; i++){
+
+      const el =
+        document.querySelector(`[data-slot="target-${i}"]`);
+
+      if(el){
+        el.classList.remove('wrong');
+        el.classList.add('correct');
+      }
+    }
+  }
+
   resultEl.style.color =
-    score === 4 ? 'green' : 'var(--accent)';
+    score === textSegments.length - 1
+      ? 'green'
+      : 'var(--accent)';
 
   resultEl.textContent =
-    `Ergebnis: ${score}/4 Punkte`;
+    `Ergebnis: ${score}/${textSegments.length - 1} Punkte`;
 }
 
 function saveAT2AndGoToNext(){
+
   let score = 0;
+  const placed = [];
 
-  textSegments.forEach((_, i)=>{
-    const val = slotContents['target-' + i];
+  for(let i = 0; i < textSegments.length; i++){
+    placed.push(slotContents['target-' + i]);
+  }
 
-    // پاراگراف اول نمره ندارد
-    if(i === 0) return;
+  // Nur die richtigen Verbindungen zählen.
+  // Die Position der Verbindung ist egal.
+  const correctConnections = new Set([
+    '0->1',
+    '1->2',
+    '2->3',
+    '3->4'
+  ]);
 
-    // چهار پاراگراف بعدی هرکدام 1 نمره
-    if(val === i){
+  for(let i = 0; i < placed.length - 1; i++){
+
+    const connection =
+      placed[i] + '->' + placed[i + 1];
+
+    if(correctConnections.has(connection)){
       score++;
     }
-  });
+  }
 
   localStorage.setItem("Lesen_AT2", score);
 
