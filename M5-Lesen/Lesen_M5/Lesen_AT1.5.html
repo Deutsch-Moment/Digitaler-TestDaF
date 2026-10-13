@@ -235,42 +235,40 @@
    correct = Index der richtigen Option (0=a,1=b,2=c,3=d)
    ============================================================ */
       const textTitle =
-        "Konfliktforschung – Die gesellschaftliche Funktion des Streits";
+        "Schadstoffe im Hausstaub";
 
       const textHTML = `
-<p>Die moderne Soziologie betrachtet soziale Konflikte längst nicht mehr als bloße Fehlentwicklungen, sondern als Triebkräfte des gesellschaftlichen Fortschritts. Wenn es darum geht, verkrustete Machtstrukturen aufzubrechen und kollektive Werte neu auszuhandeln, [[1]] konstruktive Auseinandersetzungen eine unverzichtbare Funktion. Während ein Mangel an Diskurs zu politischer Apathie führt, sind Gesellschaften ohne institutionalisierte Streitkultur inneren Spannungen oft schutzlos [[2]]. </p>
+<p>Durchschnittlich halten wir uns 90 Prozent unserer Zeit in Innenräumen auf und atmen dabei täglich zwischen 10 und 20 m³ Luft ein. Bodenbeläge, Möbel oder auch Elektrogeräte und natürlich Farben und Lacke können [[1]] Chemikalien wie z. B. Lösungsmittel abgeben, die dann in der Raumluft schweben oder sich auf dem Hausstaub absetzen. Über die Raumluft nehmen wir diese Schadstoffe dann beim Atmen auf. Die [[2]] dieser Schadstoffe hängt auch von den Temperaturen ab. Wenn es heiß ist, treten mehr Substanzen aus als bei kühlen Temperaturen. Umso wichtiger ist es also, [[3]] zu lüften. In Räumen, in denen geschlafen wird, sollte das Fenster möglichst die ganze Nacht geöffnet sein, sobald die Temperaturen es erlauben. Gegen die schwereren Substanzen, die sich im Hausstaub absetzen, hilft regelmäßiges Saugen und feuchtes Wischen. Aber wie merkt man, ob in den eigenen vier Wänden besonders viele Schadstoffe in der Luft sind? Wenn Sie keinen unangenehmen Geruch [[4]] und keine gesundheitlichen Probleme haben, können Sie zunächst aufatmen. Falls Sie im Keller noch Reste von verwendeten Farben und Lacken haben, lohnt sich ein [[5]] auf die Inhaltsstoffe, um eventuellen Schadstoffen auf die
+Spur zu kommen.</p>
 
-<p>Konfliktforscher stellten in langjährigen Analysen fest, dass die Stabilität einer Demokratie maßgeblich von ihrer Fähigkeit abhängt, produktiven Dissens zuzulassen. Ein pluralistischer Debattenraum verfügt über ein höheres Potenzial, gesellschaftliche Polarisierungen zu [[3]] da unterschiedliche Interessengruppen friedliche Kompromisse erarbeiten können. Bei autoritären Systemen zeigt sich dagegen meist der umgekehrte Effekt: Sie [[4]] mangels Meinungsfreiheit einer permanenten, latenten Instabilität, die sich irgendwann unkontrolliert entlädt.</p>
 
-<p>Die internationalen Expertenteams sind sich deshalb einig, dass das systematische Unterdrücken von Konflikten einen fatalen Dominoeffekt [[5]], der den demokratischen Grundkonsens schleichend erodieren lässt. Offene Debatten fungieren als essenzielle Ventile; werden sie jedoch tabuisiert, verwandeln sich sachliche Meinungsverschiedenheiten in unüberbrückbare gesellschaftliche Gräben.</p>
 
 `;
 
       const gaps = [
   {
-    // Lücke 1: "eine Funktion übernehmen" (neue Optionen)
-    options: ["übernehmen", "bewirken", "erzielen", "hervorrufen"],
+    options: ["ungesunde", "unwichtige", "beschädigte", "berührte"],
     correct: 0,
   },
+
   {
-    // Lücke 2: "jemandem/etwas schutzlos preisgegeben sein" (neue Optionen)
-  options: ["preisgegeben", "konfrontiert", "ausgeliefert", "überlassen"],
-  correct: 0,
+  options: ["Befreiung", "Freiheit", "Belastung", "Freisetzung"],
+  correct: 3,
 },
+
   {
-    // Lücke 3: "Polarisierungen eindämmen" (abschwächen/kontrollieren - neue Optionen)
-    options: ["minimieren", "eindämmen", "auflösen", "überwinden"],
-    correct: 1,
-  },
-  {
-    // Lücke 4: "einer Instabilität anheimfallen" (gehobener Dativ-Anschluss)
-    options: ["erliegen", "beisteuern", "anheimfallen", "entgegengehen"],
+    options: ["zeitgleich", "zeitnah", "regelmäßig", "pünktlich"],
     correct: 2,
   },
+
   {
-    // Lücke 5: "einen Effekt nach sich ziehen" (neue Optionen)
-    options: ["nach sich ziehen", "hervorbringen", "verursachen", "provozieren"],
-    correct: 0,
+    options: ["annehmen", "wahrnehmen", "verstehen", "einnehmen"],
+    correct: 1,
+  },
+
+  {
+    options: ["Augenblick", "Anblick", "Ausblick", "Blick"],
+    correct: 3,
   },
 ];
 
