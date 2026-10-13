@@ -80,15 +80,15 @@ const textTitle = "Das Rätsel der Quantenkohärenz bei der pflanzlichen Photosy
 
 const textSegments = [
 
-  "Durch den gezielten Beschuss isolierter Lichtsammelkomplexe mittels ultrakurzer Femtosekunden-Laser versuchte ein interdisziplinäres Team schließlich, Klarheit über die internen Vorgänge zu erlangen. Die Wissenschaftler bezweckten mit diesem spektroskopischen Versuchsaufbau, die hypothetischen Überlagerungszustände der Exzitonen direkt im Moment des Energietransfers experimentell zu isolieren.",
+  "Ein Forschungsteam beschoss Lichtsammelkomplexe mit Laserimpulsen. Ziel des Experiments war es, die hypothetischen quantenmechanischen Überlagerungszustände direkt beim Energietransfer nachzuweisen.",
 
-  "Weitreichende Konsequenzen für das Design moderner künstlicher Solarzellen ergaben sich aus diesen bahnbrechenden Befunden, welche die Quantenbiologie nachhaltig revolutionierten. Organische Halbleiterstrukturen, die biologische Quanteneffekte imitieren, erzielen seither in der Forschung ungeahnte Wirkungsgrade. Die dauerhafte Stabilisierung dieser sensiblen Wellenphänomene bei Raumtemperatur stellt die Ingenieurwissenschaften dennoch vor anhaltende Rätsel.",
+  "Die Entdeckungen revolutionierten die Quantenbiologie und verbesserten das Design künstlicher Solarzellen. Die Stabilisierung dieser sensiblen Quanteneffekte bei Raumtemperatur bleibt jedoch eine technologische Herausforderung.",
 
-  "Jahrzehntelang prägte die Annahme eines rein klassischen, ungeordneten Diffusionsprozesses das biochemische Standardmodell der Photosynthese. Demnach galt der Transport der eingefangenen Lichtenergie innerhalb der Pflanzenzelle als zufälliges „Hüpfen“ von Molekül zu Molekül, das durch thermisches Rauschen ständig abgebremst wird. Jegliche Ausprägung quantenmechanischer Effekte in lebenden Organismen wurde mangels empirischer Daten vehement bestritten.",
+  "Früher glaubte man, die Energieübertragung bei der Photosynthese sei ein zufälliger, klassischer Prozess. Quanteneffekte in lebenden Organismen wurden von der Wissenschaft mangels Beweisen abgelehnt.",
 
-  "Entgegen allen physikalischen Erwartungen passierten die absorbierten Photonen die molekularen Reaktionszentren simultan auf mehreren Pfaden gleichzeitig. Die Messdaten bewiesen eine nahezu verlustfreie Energieübertragung, die sich nur durch die zeitweise Aufhebung klassischer Ortseigenschaften erklären lässt. Der pflanzliche Apparat erwies sich folglich als genetisch determinierter, hochgradig kohärenter Quantencomputer.",
+  "Die Messungen zeigten überraschend, dass Photonen mehrere Wege gleichzeitig nutzen. Diese fast verlustfreie Energieübertragung beweist, dass die Pflanze wie ein hochmoderner Quantencomputer arbeitet.",
 
-  "Als jedoch thermodynamische Berechnungen die makellose Effizienz der Chloroplasten theoretisch neu evaluierten, kamen massive Zweifel an diesem klassischen Transportmodell auf. Mathematische Simulationen der Energiebilanz legten nahe, dass das biologische System viel schneller arbeiten musste, als es die Gesetze der traditionellen Physik erlaubten. Forschende vermuteten hinter dieser anomalen Geschwindigkeit eine angeborene quantenmechanische Verschränkung."
+  "Neue thermodynamische Berechnungen der Chloroplasten-Effizienz weckten Zweifel am alten Modell. Da das System viel schneller arbeitete als gedacht, vermuteten Forscher eine quantenmechanische Verschränkung."
 
 ];
 /* ============================================================ */
@@ -217,61 +217,108 @@ function onDrop(e, targetSlotId){
 }
 
 function checkOrder(){
+
   let score = 0;
-
-const correctOrder = [2, 4, 0, 3, 1];
-
   let filledCount = 0;
 
-  textSegments.forEach((_, i)=>{
+  const placed = [];
+
+  // Richtige Reihenfolge für Modelltest 5
+  // 3 → 5 → 1 → 4 → 2
+  const correctOrder = [2, 4, 0, 3, 1];
+
+  // Reihenfolge aus den Zielpositionen lesen
+  for(let i = 0; i < textSegments.length; i++){
+
     const slotId = 'target-' + i;
-    const el = document.querySelector(`[data-slot="${slotId}"]`);
-
-    el.classList.remove('correct','wrong');
-
     const val = slotContents[slotId];
 
+    const el =
+      document.querySelector(`[data-slot="${slotId}"]`);
+
+    if(el){
+      el.classList.remove('correct','wrong');
+    }
+
     if(val === undefined){
-      return;
+      placed.push(null);
+      continue;
     }
 
     filledCount++;
-
-    // پاراگراف اول نمره ندارد
-    if(i === 0){
-      if(val === correctOrder[i]){
-  
-  el.classList.add('correct');
-} else {
-  el.classList.add('wrong');
-}
-      return;
-    }
-
-    // چهار پاراگراف بعدی هر کدام 1 نمره
-    if(val === correctOrder[i]){
-  score++;
-  el.classList.add('correct');
-
-  console.log("RICHTIG:", i, "→", val);
-
-} else {
-
-    el.classList.add('wrong');
-
-    console.log("FALSCH:", i, "→", val);
-
-}
-
-});
+    placed.push(val);
+  }
 
   const resultEl = document.getElementById('result');
 
   if(filledCount < textSegments.length){
+
     resultEl.style.color = '#b8860b';
     resultEl.textContent =
       'Bitte ordnen Sie zuerst alle Textabschnitte zu.';
+
     return;
+  }
+
+  // 5 Textabschnitte = 4 Verbindungen
+  for(let i = 0; i < placed.length - 1; i++){
+
+    const current = placed[i];
+    const next = placed[i + 1];
+
+    const currentSlot =
+      document.querySelector(
+        `[data-slot="target-${i}"]`
+      );
+
+    if(
+      current === correctOrder[i] &&
+      next === correctOrder[i + 1]
+    ){
+
+      score++;
+
+      if(currentSlot){
+        currentSlot.classList.add('correct');
+      }
+
+    }else{
+
+      if(currentSlot){
+        currentSlot.classList.add('wrong');
+      }
+    }
+  }
+
+  // Bei 4/4 alle 5 Textabschnitte grün
+  if(score === 4){
+
+    for(let i = 0; i < textSegments.length; i++){
+
+      const slot =
+        document.querySelector(
+          `[data-slot="target-${i}"]`
+        );
+
+      if(slot){
+        slot.classList.remove('wrong');
+        slot.classList.add('correct');
+      }
+    }
+  }
+
+  // Bei weniger als 4 Punkten:
+  // Der letzte Abschnitt hat keine eigene Verbindung.
+  if(score < 4){
+
+    const lastSlot =
+      document.querySelector(
+        `[data-slot="target-${textSegments.length - 1}"]`
+      );
+
+    if(lastSlot){
+      lastSlot.classList.remove('correct','wrong');
+    }
   }
 
   resultEl.style.color =
@@ -282,22 +329,27 @@ const correctOrder = [2, 4, 0, 3, 1];
 }
 
 function saveAT2AndGoToNext(){
-  let score = 0;
 
+  let score = 0;
+  const placed = [];
+
+  // Richtige Reihenfolge für Modelltest 5
   const correctOrder = [2, 4, 0, 3, 1];
 
-  textSegments.forEach((_, i)=>{
-    const val = slotContents['target-' + i];
+  for(let i = 0; i < textSegments.length; i++){
+    placed.push(slotContents['target-' + i]);
+  }
 
-    if(i === 0) return;
+  // 4 Verbindungen prüfen
+  for(let i = 0; i < placed.length - 1; i++){
 
-    if(val === correctOrder[i]){
+    if(
+      placed[i] === correctOrder[i] &&
+      placed[i + 1] === correctOrder[i + 1]
+    ){
       score++;
     }
-  });
-
-console.log("SLOT CONTENTS:", slotContents);
-console.log("SCORE:", score);
+  }
 
   localStorage.setItem("Lesen_AT2.5", score);
 
