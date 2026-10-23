@@ -234,40 +234,46 @@
    gaps: Reihenfolge muss zur Nummerierung im Text passen.
    correct = Index der richtigen Option (0=a,1=b,2=c,3=d)
    ============================================================ */
-      const textTitle =
-        "Nutzen statt Besitzen";
+      const textTitle = "Vorsorge: Zwischen Sicherheit und Unsicherheit";
 
       const textHTML = `
-<p>Der Trend, Alltagsgegenstände oder Fahrzeuge zu teilen, statt sie käuflich zu erwerben, hat das Konsumverhalten moderner Stadtbewohner grundlegend revolutioniert. Ökonomen wiesen bereits vor Jahren darauf hin, dass diese kollaborative Wirtschaftsform das Potenzial besitzt, Ressourcen drastisch zu schonen. Mittlerweile [[1]] sich das Sharing-Prinzip fest im Alltag verankert, da digitale Plattformen den Zugang zu Leihgütern extrem vereinfachen. Dennoch ist der Verzicht auf Eigentum für viele Menschen weiterhin mit psychologischen Hürden verbunden.</p>
+<p>Vorsorge beruht auf dem Gedanken, mögliche Schäden zu begrenzen, bevor sie entstehen. Was zunächst selbstverständlich erscheint, erweist sich bei näherer Betrachtung jedoch als anspruchsvoll: Entscheidungen müssen zu einem Zeitpunkt getroffen werden, zu dem noch unklar ist, ob das befürchtete Ereignis überhaupt [[1]] .</p>
 
-<p>Der psychologische Knackpunkt liegt im Gefühl der Kontrolle. Wer ein Auto besitzt, erfährt ein Gefühl von Sicherheit, das beim spontanen Mieten oft [[2]] . Umfragen zeigen, dass Verbraucher vor allem dann zögern, wenn die Verfügbarkeit eines Objekts nicht garantiert ist. Das Risiko, im entscheidenden Moment ohne Transportmittel dazustehen, wird subjektiv als Belastung [[3]] .</p>
+<p>Im Gesundheitsbereich bedeutet dies beispielsweise, persönliche Risiken abzuwägen, ohne jede körperliche Veränderung als Anzeichen einer Erkrankung zu deuten. Früherkennungsuntersuchungen können Hinweise liefern; ein auffälliger Befund ist jedoch nicht [[2]] mit einer gesicherten Diagnose gleichzusetzen. Wer diesen Unterschied übersieht, könnte zusätzliche Untersuchungen für grundsätzlich sinnvoll halten, obwohl deren Nutzen jeweils geprüft werden muss.</p>
 
-<p>Aus diesem Grund versuchen Anbieter, das Vertrauen durch transparente Bewertungssysteme zu stärken. Eine lückenlose Dokumentation soll sicherstellen, dass die geteilten Objekte stets in optimalem Zustand bereitstehen. Die Akzeptanz dieser Modelle hängt folglich stark davon ab, wie verlässlich die Infrastruktur [[4]] . Nur wenn der Komfort den Aufwand des Teilens übersteigt, sind Konsumenten bereit, ihre alten Gewohnheiten dauerhaft [[5]] . (195 Wörter)</p>
+<p>Ähnliche Schwierigkeiten ergeben sich bei der finanziellen Vorsorge. Je weiter mögliche Belastungen in der Zukunft liegen, desto geringer fällt häufig die [[3]] aus, gegenwärtig auf Konsum zu verzichten. Dabei hängt vorausschauendes Handeln nicht allein vom verfügbaren Einkommen ab, sondern auch davon, wie verständlich Informationen aufbereitet werden.</p>
+
+<p>Eine verantwortungsvolle Vorsorge sollte deshalb weder Risiken verharmlosen noch den Eindruck vollständiger Sicherheit [[4]] . Ihr Ziel besteht vielmehr darin, Handlungsspielräume zu erhalten. Dafür müssen Maßnahmen regelmäßig überprüft und gegebenenfalls angepasst werden. Entscheidend ist somit nicht, möglichst viele Vorkehrungen zu treffen, sondern deren Nutzen und mögliche Nachteile in ein angemessenes [[5]] zu setzen. Vorsorge bleibt damit eine Entscheidung unter Unsicherheit.</p>
+
 
 `;
 
       const gaps = [
-  {
-    options: ["bleibt", "wird", "ist", "hat"],
-    correct: 3,
-  },
-  {
-    options: ["aufhört", "ausbleibt", "fehlt", "vergeht"],
-    correct: 1,
-  },
-  {
-    options: ["angesehen", "empfunden", "gehalten", "genommen"],
-    correct: 1,
-  },
-  {
-    options: ["agiert", "ausfällt", "funktioniert", "stattfindet"],
-    correct: 2,
-  },
-  {
-    options: ["abzulehnen", "zu verteidigen", "beizubehalten", "aufzugeben"],
-    correct: 3,
-  },
-];
+        {
+          options: ["gelingt", "besteht", "eintritt", "fortschreitet"],
+          correct: 2,
+        },
+
+        {
+          options: ["zwangsläufig", "vorsorglich", "überwiegend", "nachträglich"],
+          correct: 0,
+        },
+
+        {
+          options: ["Zuversicht", "Belastung", "Aussicht", "Bereitschaft"],
+          correct: 3,
+        },
+
+        {
+          options: ["rechtfertigen", "vermitteln", "voraussetzen", "bestätigen"],
+          correct: 1,
+        },
+
+        {
+          options: ["Gleichgewicht", "Konzept", "Verfahren", "Verhältnis"],
+          correct: 3,
+        },
+      ];
       /* ============================================================ */
 
       let userAnswers = new Array(gaps.length).fill(null);
