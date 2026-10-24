@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>TestDaF Übung – Text &amp; Fragen</title>
+<style>
+  :root{
+    --primary:#0e6e8c;
+    --accent:#c8102e;
+    --bg-box:#dde3e8;
+    --border:#0e6e8c;
+  }
+  *{box-sizing:border-box; font-family: Arial, Helvetica, sans-serif;}
+  body{margin:0; padding:20px; background:#f4f6f7; color:#222;}
+  .header{background:var(--primary); color:#fff; padding:14px 20px; font-size:22px; font-weight:bold; border-radius:4px 4px 0 0;}
+  .instructions{background:#eaf1f4; padding:16px 20px; font-size:15px; line-height:1.5;}
+  .timer{display:inline-block; border:2px solid var(--primary); border-radius:50%; width:70px; height:70px; text-align:center; line-height:70px; font-weight:bold; color:var(--primary); margin-top:10px;}
+  .toolbar{display:flex; justify-content:flex-end; gap:8px; padding:10px 20px 0 20px; background:#fff;}
+  .toolbtn{width:38px; height:38px; border:1px solid var(--primary); background:#fff; color:var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px;}
+  .toolbtn.small{font-size:12px;}
+  .toolbtn.big{font-size:16px;}
+  .toolbtn.active{background:var(--primary); color:#fff;}
+  .main{display:flex; gap:16px; padding:10px 20px 20px 20px; background:#fff;}
+  .textpanel{flex:1; max-height:600px; overflow-y:auto; padding-right:10px; border-right:1px solid #ccc; font: size 15px; line-height:1.6;}
+  .textpanel h3{color:var(--primary);}
+  .textpanel p{margin-bottom:16px;}
+  .textpanel .pnum{font-weight:bold; color:var(--primary);}
+  .textpanel mark.hl{background:#fdea63; cursor:pointer; border-radius:2px;}
+  .textpanel.marking{cursor:text;}
+  .qpanel{flex:1.2;}
+  .qrow{background:var(--bg-box); border:1px solid #aab; border-radius:4px; margin-bottom:10px; overflow:hidden;}
+  .qhead{padding:10px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size: 15px;}
+  .qhead b{color:var(--primary); margin-right:6px;}
+  .qhead.answered{background:#eef3f5;}
+  .qbody{display:none; padding:8px 14px 14px 14px; background:#fff;}
+  .qbody.open{display:block;}
+  .option{display:block; width:100%; text-align:left; padding:8px 10px; margin:4px 0; border:1px solid #bbb; border-radius:4px; background:#fdfdfd; cursor:pointer; user-select:text; font-size:15px;}
+  .option.selected{border-color:var(--primary); background:#dceaf0;}
+  .option.correct{border-color:green; background:#e3f7e3;}
+  .option.wrong{border-color:var(--accent); background:#fbe4e7;}
+  .option,
+.option * {
+    font-size: 15px !important;
+}
+
+.option{
+    display:block;
+    width:100%;
+    text-align:left;
+    padding:8px 10px;
+    margin:4px 0;
+    border:1px solid #bbb;
+    border-radius:4px;
+    background:#fdfdfd;
+    cursor:pointer;
+    user-select:text;
+    font-size:15px;
+}
+  .footer{display:flex; justify-content:flex-end; gap:10px; padding:16px 20px;}
+  button{background:var(--accent); color:#fff;; border:none; padding:10px 20px; border-radius:4px; font-size:15px; cursor:pointer;}
+  button.secondary{background:#888;}
+  #result{padding:0 20px 20px; font-weight:bold;}
+  </style>
+</head>
+<body>
+
+<div class="header">LESEN – Aufgabentyp 3: Text &amp; Fragen</div>
+
+<div class="instructions">
+  Lesen Sie den Text.<br>
+  <strong>Beantworten Sie die Fragen 1–7.</strong><br>
+  Klicken Sie die Fragen an und entscheiden Sie, welche Lösung passt.<br>
+  Für jede Frage gibt es genau eine richtige Lösung.
+  <div class="timer" id="timer">15:10</div>
+</div>
+
+<div class="toolbar">
+  <button class="toolbtn small" onclick="changeFontSize(-1)" title="Verkleinern">A-</button>
+  <button class="toolbtn big" onclick="changeFontSize(1)" title="Vergrößern">A+</button>
+  <button class="toolbtn" id="markBtn" onclick="toggleMarking()" title="Markieren">✎</button>
+</div>
+
+<div class="main">
+  <div class="textpanel" id="textpanel"></div>
+  <div class="qpanel" id="qpanel"></div>
+</div>
+
+<div id="result"></div>
+
+<div class="footer">
+
+  <button class="action secondary" onclick="resetExercise()">
+    Zurücksetzen
+  </button>
+
+  <button class="action" onclick="checkAnswers()">
+    Prüfen
+  </button>
+
+  <button class="action" onclick="saveAT3AndGoToNext()">Weiter</button>
+</button>
+
+</div>
+
+<script>
+/* ============================================================
+   HIER ANPASSEN: Neue Übung = Titel, Absätze und Fragen ersetzen.
+   correct = Index (0=a, 1=b, 2=c, 3=d)
+   ============================================================ */
+const textTitle = "Protein-Hype: Wie viel Eiweiß brauchen wir wirklich?";
+
+const paragraphs = [
+
+"Proteinreiche Lebensmittel sind in aller Munde. In Supermärkten finden sich Joghurts mit extra viel Eiweiß, Proteinriegel gelten als gesunder Snack und selbst Brot oder Getränke werden zunehmend mit dem Hinweis „High Protein“ beworben. In sozialen Medien empfehlen Fitness-Influencer eine eiweißreiche Ernährung, um Muskeln aufzubauen, Gewicht zu verlieren oder länger satt zu bleiben. Dabei entsteht leicht der Eindruck, dass herkömmliche Lebensmittel den Körper nicht ausreichend mit diesem Nährstoff versorgen. Ernährungswissenschaftler weisen jedoch darauf hin, dass der tatsächliche Bedarf häufig überschätzt wird. Zwar ist Eiweiß für zahlreiche Körperfunktionen unverzichtbar, doch daraus folgt nicht automatisch, dass eine möglichst hohe Zufuhr gesundheitliche Vorteile bringt.",
+
+"Proteine erfüllen im menschlichen Körper vielfältige Aufgaben. Sie sind unter anderem am Aufbau von Muskeln, Haut und Organen beteiligt und spielen eine wichtige Rolle bei der Bildung von Enzymen und bestimmten Hormonen. Da der Körper einige Aminosäuren nicht selbst herstellen kann, müssen diese über die Nahrung aufgenommen werden. Als Proteinquellen kommen sowohl tierische Lebensmittel wie Eier, Milchprodukte und Fisch als auch pflanzliche Produkte wie Hülsenfrüchte, Nüsse und Getreide infrage. Entscheidend ist dabei nicht, dass jede einzelne Mahlzeit sämtliche notwendigen Aminosäuren in optimaler Menge enthält. Vielmehr kann eine abwechslungsreiche Ernährung über den Tag hinweg dazu beitragen, den Bedarf zu decken. Wer unterschiedliche Lebensmittel kombiniert, ist daher nicht zwangsläufig auf spezielle Eiweißprodukte angewiesen.",
+
+"Wie viel Protein ein Mensch benötigt, hängt von verschiedenen Faktoren ab. Neben dem Körpergewicht spielen insbesondere das Alter, der Gesundheitszustand und die körperliche Aktivität eine Rolle. Für gesunde Erwachsene wird häufig eine tägliche Zufuhr von ungefähr 0,8 Gramm Eiweiß pro Kilogramm Körpergewicht als Richtwert genannt. Bei einer Person mit einem Gewicht von 70 Kilogramm entspricht dies etwa 56 Gramm pro Tag. Menschen, die regelmäßig intensiv Krafttraining betreiben, können einen höheren Bedarf haben, insbesondere wenn sie Muskelmasse aufbauen möchten. Daraus lässt sich allerdings nicht ableiten, dass sämtliche Freizeitsportler große Mengen an Proteinpulver benötigen. Auch bei sportlich aktiven Menschen müssen zusätzliche Mengen im Zusammenhang mit Trainingsintensität, Gesamtenergiezufuhr und individuellen Zielen betrachtet werden.",
+
+"Ein Grund für den anhaltenden Proteintrend liegt in der Vermarktung entsprechender Produkte. Hersteller heben den Eiweißgehalt auf Verpackungen deutlich hervor und verbinden ihn mit Vorstellungen von Fitness, Leistungsfähigkeit und einem gesunden Lebensstil. Dass ein Produkt viel Protein enthält, sagt jedoch wenig über seine gesamte ernährungsphysiologische Qualität aus. Ein Proteinriegel kann beispielsweise gleichzeitig erhebliche Mengen an Zucker, Fett oder Energie liefern. Zudem werden manche Produkte zu Preisen angeboten, die deutlich über denen vergleichbarer herkömmlicher Lebensmittel liegen. Verbraucher stehen somit vor der Schwierigkeit, zwischen wissenschaftlich begründeten Empfehlungen und Werbeaussagen zu unterscheiden. Die auffällige Kennzeichnung eines Nährstoffs kann dazu führen, dass andere Eigenschaften eines Lebensmittels bei der Kaufentscheidung in den Hintergrund treten.",
+
+"Besonders häufig wird eine eiweißreiche Ernährung mit Gewichtsabnahme in Verbindung gebracht. Tatsächlich können proteinreiche Mahlzeiten das Sättigungsgefühl unterstützen. Wer sich länger satt fühlt, nimmt möglicherweise bei späteren Mahlzeiten weniger Nahrung zu sich. Darüber hinaus benötigt der Körper für die Verarbeitung von Protein etwas mehr Energie als für die Verarbeitung von Fett oder Kohlenhydraten. Diese Effekte werden in der Werbung jedoch teilweise so dargestellt, als könne eine erhöhte Eiweißzufuhr allein überschüssiges Körperfett verschwinden lassen. Eine solche Schlussfolgerung greift zu kurz. Für die langfristige Entwicklung des Körpergewichts sind unter anderem die gesamte Energieaufnahme, die körperliche Bewegung und die dauerhaften Ernährungsgewohnheiten entscheidend. Protein kann innerhalb eines ausgewogenen Ernährungskonzepts hilfreich sein, ersetzt aber keine umfassende Betrachtung des Lebensstils.",
+
+"Auch die Vorstellung, zusätzliches Eiweiß werde grundsätzlich in Muskelmasse umgewandelt, ist problematisch. Muskelaufbau setzt regelmäßiges Training voraus, wobei eine ausreichende Proteinversorgung diesen Prozess unterstützt. Eine übermäßige Zufuhr führt jedoch nicht automatisch zu besseren Ergebnissen. Gleichzeitig beeinflussen soziale Medien und Werbung unsere Vorstellungen von gesunder Ernährung. Proteinreiche Produkte können durchaus sinnvoll sein, sind aber nicht für jeden notwendig. Entscheidend ist, den individuellen Bedarf zu berücksichtigen und sich ausgewogen zu ernähren, statt sich ausschließlich auf einen einzelnen Nährstoff zu konzentrieren.",
+
+];
+
+const questions = [
+
+  { stem: "Welche Fehlvorstellung kann durch den Proteintrend entstehen?",
+  options: [
+    "Der Körper könne Eiweiß nur aus speziell angereicherten Lebensmitteln beziehen.",
+    "Der Eiweißbedarf sei unabhängig von körperlicher Aktivität.",
+    "Pflanzliche Proteinquellen könnten tierische Produkte grundsätzlich nicht ersetzen.",
+    "Eine erhöhte Eiweißzufuhr sei ausschließlich für den Muskelaufbau relevant."
+  ],
+  correct: 0
+},
+
+  { stem: "Wie lässt sich der Aminosäurebedarf laut Absatz 2 decken?",
+    options: [
+      "Durch tierisches Eiweiß allein.",
+      "Durch ergänzende Proteinprodukte.",
+      "Durch identisch zusammengesetzte Mahlzeiten.",
+      "Durch abwechslungsreiche Ernährung."
+    ],
+    correct: 3
+  },
+
+  { stem: "Welche Schlussfolgerung lässt sich aus Absatz 3 ziehen?",
+  options: [
+    "Das Körpergewicht ist für die Berechnung des Proteinbedarfs unerheblich.",
+    "Der Proteinbedarf lässt sich nicht anhand eines einzigen Faktors bestimmen.",
+    "Krafttraining führt unabhängig von der Ernährung zu einem erhöhten Bedarf.",
+    "Freizeitsportler benötigen grundsätzlich dieselbe Proteinmenge wie Nichtsportler."
+  ],
+  correct: 1
+},
+
+  { stem: "Die Werbung für Proteinprodukte kann laut Absatz 4 ...",
+    options: [
+      "Preisunterschiede verständlicher machen.",
+      "wissenschaftliche Empfehlungen ersetzen.",
+      "andere Produkteigenschaften verdecken.",
+      "die gesamte Nährstoffqualität belegen."
+    ],
+    correct: 2 },
+
+  { stem: "Welche Rolle spielt Protein beim Abnehmen laut Absatz 5?",
+    options: [
+      "Es gleicht überschüssige Kalorien aus.",
+      "Es kann ein Ernährungskonzept unterstützen.",
+      "Es ersetzt langfristige Ernährungsänderungen.",
+      "Es wirkt unabhängig vom Lebensstil."
+    ],
+    correct: 1 },
+
+  { stem: "Welche Annahme weist der Text laut Absatz 6 zurück?",
+    options: [
+      "Training ist für Muskelaufbau notwendig.",
+      "Proteinprodukte können sinnvoll sein.",
+      "Eiweiß unterstützt den Muskelaufbau.",
+      "Mehr Eiweiß bedeutet automatisch mehr Muskeln."
+    ],
+    correct: 3 },
+
+  { stem: "Insgesamt macht der Text deutlich, dass ...",
+    options: [
+      "die Eiweißzufuhr dem Bedarf entsprechen sollte.",
+      "der Eiweißgehalt die Lebensmittelqualität bestimmt.",
+      "Proteinprodukte überwiegend schädlich sind.",
+      "herkömmliche Lebensmittel selten ausreichen."
+    ],
+    correct: 0 }
+
+];
+
+let userAnswers = new Array(questions.length).fill(null);
+let timeLeft = 910;
+let timerInterval;
+let fontSize = 15;
+let markingOn = false;
+const letters = ['a','b','c','d'];
+
+
+function changeFontSize(delta){
+  fontSize = Math.min(22, Math.max(11, fontSize + delta));
+
+  document.getElementById('textpanel').style.fontSize = fontSize + 'px';
+}
+
+function toggleMarking(){
+  markingOn = !markingOn;
+  const btn = document.getElementById('markBtn');
+  const tp = document.getElementById('textpanel');
+  btn.classList.toggle('active', markingOn);
+  tp.classList.toggle('marking', markingOn);
+}
+
+function handleTextpanelMouseUp(){
+  if(!markingOn) return;
+  const sel = window.getSelection();
+  if(!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  const tp = document.getElementById('textpanel');
+  const allowed =
+  document.getElementById('textpanel').contains(range.commonAncestorContainer) ||
+  document.getElementById('qpanel').contains(range.commonAncestorContainer);
+
+if(!allowed) return;
+  if(range.toString().trim() === '') { sel.removeAllRanges(); return; }
+  try{
+    const mark = document.createElement('mark');
+    mark.className = 'hl';
+    range.surroundContents(mark);
+  }catch(e){
+    // selection crosses element boundaries; skip silently
+  }
+  sel.removeAllRanges();
+}
+
+
+function handleTextpanelClick(e){
+  const mark = e.target.closest('mark.hl');
+  if(mark){
+    const parent = mark.parentNode;
+    while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+    parent.removeChild(mark);
+    parent.normalize();
+  }
+}
+
+function buildExercise(){
+  const tp = document.getElementById('textpanel');
+  tp.innerHTML = `<h3>${textTitle}</h3>` +
+  paragraphs.map((p,i)=>
+    `<p class="paragraph-${i}">
+      <span class="pnum">(${i+1})</span> ${p}
+    </p>`
+  ).join('');
+  fontSize = 15;
+  tp.style.fontSize = fontSize + 'px';
+  markingOn = false;
+  document.getElementById('markBtn').classList.remove('active');
+  tp.classList.remove('marking');
+  tp.onmouseup = handleTextpanelMouseUp;
+  document.getElementById('qpanel').onmouseup = handleTextpanelMouseUp;
+  tp.onclick = handleTextpanelClick;
+  
+  const qp = document.getElementById('qpanel');
+  qp.innerHTML = '';
+  userAnswers = new Array(questions.length).fill(null);
+
+  questions.forEach((q, qi)=>{
+    const row = document.createElement('div');
+    row.className = 'qrow';
+
+    const head = document.createElement('div');
+    head.className = 'qhead';
+    head.innerHTML = `<span><b>Frage ${qi+1}:</b> ${q.stem}</span><span>▾</span>`;
+    head.onclick = ()=> toggleBody(qi);
+
+    const body = document.createElement('div');
+    body.className = 'qbody';
+    body.id = 'qbody-'+qi;
+
+    q.options.forEach((opt, oi)=>{
+  const b = document.createElement('div');
+
+  b.className = 'option';
+
+  b.innerHTML =
+    `<span class="option-letter">${letters[oi]})</span> ${opt}`;
+
+  b.onclick = ()=> selectOption(qi, oi);
+
+  body.appendChild(b);
+});
+
+    row.appendChild(head);
+    row.appendChild(body);
+    qp.appendChild(row);
+  });
+
+  document.getElementById('result').textContent = '';
+  startTimer();
+}
+
+function toggleBody(qi){
+
+  // Alle anderen Fragen schließen
+  document.querySelectorAll('.qbody').forEach((body, i) => {
+    if(i !== qi){
+      body.classList.remove('open');
+    }
+  });
+
+  // Nur die angeklickte Frage öffnen
+  const body = document.getElementById('qbody-' + qi);
+  body.classList.toggle('open');
+
+  // Zum passenden Absatz springen
+  const paragraph = document.querySelector(
+    '#textpanel .paragraph-' + qi
+  );
+
+  if(paragraph){
+    paragraph.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+    // Absatz hervorheben
+    document.querySelectorAll('#textpanel p').forEach(p => {
+      p.classList.remove('focus-paragraph');
+    });
+
+    paragraph.classList.add('focus-paragraph');
+  }
+}
+
+function selectOption(qi, oi){
+  userAnswers[qi] = oi;
+  const body = document.getElementById('qbody-'+qi);
+  [...body.children].forEach((btn, i)=>{
+    btn.classList.toggle('selected', i===oi);
+  });
+  const heads = document.querySelectorAll('.qhead');
+  heads[qi].classList.add('answered');
+}
+
+function saveAT3AndGoToNext(){
+  let score = 0;
+
+  questions.forEach((q, qi)=>{
+    if(userAnswers[qi] === q.correct){
+      score++;
+    }
+  });
+
+  localStorage.setItem("Lesen_AT3.6", score);
+
+  window.location.href = "Lesen_AT4.6.html";
+}
+
+function checkAnswers(){
+  clearInterval(timerInterval);
+  let score = 0;
+  questions.forEach((q, qi)=>{
+    const body = document.getElementById('qbody-'+qi);
+    [...body.children].forEach((btn, oi)=>{
+      btn.classList.remove('selected');
+      if(oi === q.correct) btn.classList.add('correct');
+      else if(oi === userAnswers[qi]) btn.classList.add('wrong');
+    });
+    body.classList.add('open');
+    if(userAnswers[qi] === q.correct) score++;
+  });
+  const resultEl = document.getElementById('result');
+
+  resultEl.style.color = score === questions.length ? 'green' : 'var(--accent)';
+  resultEl.textContent = `Ergebnis: ${score} von ${questions.length} richtig.`;
+}
+
+function resetExercise(){
+  clearInterval(timerInterval);
+  timeLeft = 910;
+  buildExercise();
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = 910;
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    updateTimerDisplay();
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      checkAnswers();
+    }
+  },1000);
+}
+
+function updateTimerDisplay(){
+  const m = String(Math.floor(timeLeft/60)).padStart(2,'0');
+  const s = String(timeLeft%60).padStart(2,'0');
+  document.getElementById('timer').textContent = `${m}:${s}`;
+}
+
+buildExercise();
+</script>
+
+</body>
+</html>
