@@ -1,356 +1,476 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>TestDaF Übung – Lückentext</title>
-<style>
-  :root{
-    --primary:#0e6e8c;
-    --accent:#c8102e;
-    --bg-box:#dde3e8;
-  }
-  *{box-sizing:border-box; font-family: Arial, Helvetica, sans-serif;}
-  body{margin:0; padding:20px; background:#f4f6f7; color:#222;}
-  .header{background:var(--primary); color:#fff; padding:14px 20px; font-size:22px; font-weight:bold; border-radius:4px 4px 0 0;}
-  .instructions{background:#eaf1f4; padding:16px 20px; font-size:14px; line-height:1.5;}
-  .timer{display:inline-block; border:2px solid var(--primary); border-radius:50%; width:70px; height:70px; text-align:center; line-height:70px; font-weight:bold; color:var(--primary); margin-top:10px;}
-  .toolbar{display:flex; justify-content:flex-end; gap:8px; padding:10px 20px 0 20px; background:#fff;}
-  .toolbtn{width:38px; height:38px; border:1px solid var(--primary); background:#fff; color:var(--primary); border-radius:4px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px;}
-  .toolbtn.small{font-size:16px;}
-  .toolbtn.big{font-size:18px;}
-  .toolbtn.active{background:var(--primary); color:#fff;}
-  .main{padding:10px 20px 20px 20px; background:#fff;}
-  #textpanel{max-width:900px; font-size:15px; line-height:1.7; position:relative;}
-  #textpanel h3{color:var(--primary);}
-  #textpanel p{margin-bottom:18px;}
-  #textpanel mark.hl{background:#fdea63; cursor:pointer; border-radius:2px;}
-  .gap{display:inline-block; min-width:70px; border-bottom:2px solid var(--primary); text-align:center; cursor:pointer; padding:0 4px; position:relative; color:var(--primary); font-weight:bold;}
-  .gap.filled{color:#222; font-weight:normal; border-bottom-style:solid;}
-  .gap.correct{border-bottom-color:green; background:#e3f7e3;}
-  .gap.wrong{border-bottom-color:var(--accent); background:#fbe4e7;}
-  .dropdown{position:absolute; top:100%; left:0; background:#eee; border:1px solid #999; display:flex; z-index:10; box-shadow:0 2px 6px rgba(0,0,0,0.2); white-space:nowrap;}
-  .dropdown button{border:none; background:#eee; padding:8px 14px; cursor:pointer; font-size:14px; border-right:1px solid #ccc;}
-  .dropdown button:hover{background:#ddd;}
-  .dropdown button.clear{background:var(--accent); color:#fff; font-weight:bold; width:34px;}
-  .footer{display:flex; justify-content:flex-end; gap:10px; padding:16px 20px;}
-  button.action{background:var(--accent); color:#fff; border:none; padding:10px 20px; border-radius:4px; font-size:15px; cursor:pointer;}
-  button.action.secondary{background:#888;}
-  #result{padding:0 20px 20px; font-weight:bold;}
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>TestDaF Übung – Lückentext</title>
+    <style>
+      :root {
+        --primary: #0e6e8c;
+        --accent: #c8102e;
+        --bg-box: #dde3e8;
+      }
+      * {
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #f4f6f7;
+        color: #222;
+      }
+      .header {
+        background: var(--primary);
+        color: #fff;
+        padding: 14px 20px;
+        font-size: 22px;
+        font-weight: bold;
+        border-radius: 4px 4px 0 0;
+      }
+      .instructions {
+        background: #eaf1f4;
+        padding: 16px 20px;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      .timer {
+        display: inline-block;
+        border: 2px solid var(--primary);
+        border-radius: 50%;
+        width: 70px;
+        height: 70px;
+        text-align: center;
+        line-height: 70px;
+        font-weight: bold;
+        color: var(--primary);
+        margin-top: 10px;
+      }
+      .toolbar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 10px 20px 0 20px;
+        background: #fff;
+      }
+      .toolbtn {
+        width: 38px;
+        height: 38px;
+        border: 1px solid var(--primary);
+        background: #fff;
+        color: var(--primary);
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+      }
+      .toolbtn.small {
+        font-size: 12px;
+      }
+      .toolbtn.big {
+        font-size: 18px;
+      }
+      .toolbtn.active {
+        background: var(--primary);
+        color: #fff;
+      }
+      .main {
+        padding: 10px 20px 20px 20px;
+        background: #fff;
+      }
+      #textpanel {
+        max-width: 900px;
+        font-size: 15px;
+        line-height: 1.7;
+        position: relative;
+      }
+      #textpanel h3 {
+        color: var(--primary);
+      }
+      #textpanel p {
+        margin-bottom: 18px;
+      }
+      #textpanel mark.hl {
+        background: #fdea63;
+        cursor: pointer;
+        border-radius: 2px;
+      }
+      .gap {
+        display: inline-block;
+        min-width: 70px;
+        border-bottom: 2px solid var(--primary);
+        text-align: center;
+        cursor: pointer;
+        padding: 0 4px;
+        position: relative;
+        color: var(--primary);
+        font-weight: bold;
+      }
+      .gap.filled {
+        color: #222;
+        font-weight: normal;
+        border-bottom-style: solid;
+      }
+      .gap.correct {
+        border-bottom-color: green;
+        background: #e3f7e3;
+      }
+      .gap.wrong {
+        border-bottom-color: var(--accent);
+        background: #fbe4e7;
+      }
+      .dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #eee;
+        border: 1px solid #999;
+        display: flex;
+        z-index: 10;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        white-space: nowrap;
+      }
+      .dropdown button {
+        border: none;
+        background: #eee;
+        padding: 8px 14px;
+        cursor: pointer;
+        font-size: 14px;
+        border-right: 1px solid #ccc;
+      }
+      .dropdown button:hover {
+        background: #ddd;
+      }
+      .dropdown button.clear {
+        background: var(--accent);
+        color: #fff;
+        font-weight: bold;
+        width: 34px;
+      }
+      .footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 20px;
+      }
+      button.action {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-size: 15px;
+        cursor: pointer;
+      }
+      button.action.secondary {
+        background: #888;
+      }
+      #result {
+        padding: 0 20px 20px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">LESEN – Aufgabentyp 1: Lückentext</div>
 
-<div class="header">LESEN – Aufgabe: Lückentext</div>
+    <div class="instructions">
+      Lesen Sie den Text.<br />
+      <strong
+        >Klicken Sie in die Lücken und entscheiden Sie, welches Wort
+        passt.</strong
+      ><br />
+      Für jede Lücke gibt es genau eine richtige Lösung.
+      <div class="timer" id="timer">04:10</div>
+    </div>
 
-<div class="instructions">
-  Lesen Sie den Text.<br>
-  <strong>Klicken Sie in die Lücken und entscheiden Sie, welches Wort passt.</strong><br>
-  Für jede Lücke gibt es genau eine richtige Lösung.
-  <div class="timer" id="timer">04:00</div>
-</div>
+    <div class="toolbar">
+      <button
+        class="toolbtn small"
+        onclick="changeFontSize(-1)"
+        title="Verkleinern"
+      >
+        A-
+      </button>
+      <button
+        class="toolbtn big"
+        onclick="changeFontSize(1)"
+        title="Vergrößern"
+      >
+        A+
+      </button>
+      <button
+        class="toolbtn"
+        id="markBtn"
+        onclick="toggleMarking()"
+        title="Markieren"
+      >
+        ✎
+      </button>
+    </div>
 
-<div class="toolbar">
-  <button class="toolbtn small" onclick="changeFontSize(-1)" title="Verkleinern">A-</button>
-  <button class="toolbtn big" onclick="changeFontSize(1)" title="Vergrößern">A+</button>
-  <button class="toolbtn" id="markBtn" onclick="toggleMarking()" title="Markieren">✎</button>
-</div>
+    <div class="main">
+      <div id="textpanel"></div>
+    </div>
 
-<div class="main">
-  <div id="textpanel"></div>
-</div>
+    <div id="result"></div>
 
-<div id="result"></div>
+    <div class="footer">
+      <button class="action secondary" onclick="resetExercise()">
+        Zurücksetzen
+      </button>
 
-<div class="footer">
-  <button class="action secondary" onclick="resetExercise()">
-    Zurücksetzen
-  </button>
+      <button class="action" onclick="checkAnswers()">Prüfen</button>
 
-  <button class="action" onclick="checkAnswers()">
-    Prüfen
-  </button>
+      <button class="action" onclick="saveAndGoToNext()">Weiter</button>
+    </div>
 
-  <button class="action" onclick="saveAndGoToNext()">
-  Aufgabe 2
-</button>
-</div>
-
-<script>
-/* ============================================================
+    <script>
+      /* ============================================================
    HIER ANPASSEN: Neue Übung = Titel, Text und Lücken ersetzen.
    Im Text markieren Sie jede Lücke mit [[1]], [[2]], usw.
    gaps: Reihenfolge muss zur Nummerierung im Text passen.
    correct = Index der richtigen Option (0=a,1=b,2=c,3=d)
    ============================================================ */
-const textTitle = "Neuroökonomie und Entscheidungsverhalten";
+      const textTitle =
+        "Schadstoffe im Hausstaub";
 
-const textHTML = `
-<p>Die Neuroökonomie kombiniert neurowissenschaftliche Methoden mit ökonomischen Theorien, um menschliches Handeln bei finanziellen Risikoentscheidungen zu analysieren. Klassische Wirtschaftsmodelle gingen lange Zeit davon aus, dass Individuen stets rein rational agieren und ihren persönlichen Nutzen maximieren. Experimentelle Untersuchungen mittels funktioneller Magnetresonanztomographie (fMRT) haben diese Annahme jedoch [[1]].</p>
-
-<p>Es zeigte sich, dass emotionale Zentren im Gehirn, insbesondere die Amygdala, bei Verlustangst übermäßig stark aktiviert werden. Dies führt dazu, dass Menschen mathematisch günstige Chancen ablehnen, nur um potenzielle Verluste zu vermeiden. [[2]] die Neurowissenschaften diesen unbewussten Mechanismus detailliert beschreiben können, bleibt umstritten, wie stark emotionale Impulse durch kognitive Kontrolle überschrieben werden können.</p>
-
-<p>In der Praxis nutzen Finanzinstitute diese Erkenntnisse bereits, um Risikoprofile von Anlegern präziser zu erstellen. Eine [[3]] Erfassung neuronaler Prozesse könnte in Zukunft dazu beitragen, fehlerhafte Anlagestrategien frühzeitig zu korrigieren.</p>
-
-<p>Kritiker warnen jedoch vor den ethischen Gefahren dieser Technologie. Wenn Unternehmen das Entscheidungsverhalten von Konsumenten gezielt manipulieren, wird die individuelle Wahlfreiheit [[4]]. Daher fordern Ethiker strenge rechtliche Rahmenbedingungen für die [[5]] neuroökonomischer Daten im kommerziellen Sektor.</p>
+      const textHTML = `
+<p>Durchschnittlich halten wir uns 90 Prozent unserer Zeit in Innenräumen auf und atmen dabei täglich zwischen 10 und 20 m³ Luft ein. Bodenbeläge, Möbel oder auch Elektrogeräte und natürlich Farben und Lacke können [[1]] Chemikalien wie z. B. Lösungsmittel abgeben, die dann in der Raumluft schweben oder sich auf dem Hausstaub absetzen. Über die Raumluft nehmen wir diese Schadstoffe dann beim Atmen auf. Die [[2]] dieser Schadstoffe hängt auch von den Temperaturen ab. Wenn es heiß ist, treten mehr Substanzen aus als bei kühlen Temperaturen. Umso wichtiger ist es also, [[3]] zu lüften. In Räumen, in denen geschlafen wird, sollte das Fenster möglichst die ganze Nacht geöffnet sein, sobald die Temperaturen es erlauben. Gegen die schwereren Substanzen, die sich im Hausstaub absetzen, hilft regelmäßiges Saugen und feuchtes Wischen. Aber wie merkt man, ob in den eigenen vier Wänden besonders viele Schadstoffe in der Luft sind? Wenn Sie keinen unangenehmen Geruch [[4]] und keine gesundheitlichen Probleme haben, können Sie zunächst aufatmen. Falls Sie im Keller noch Reste von verwendeten Farben und Lacken haben, lohnt sich ein [[5]] auf die Inhaltsstoffe, um eventuellen Schadstoffen auf die
+Spur zu kommen.</p>
 
 
 `;
 
-const gaps = [
+      const gaps = [
   {
-    // Verb
-    options: [
-      "widerlegt",
-      "revidiert",
-      "verworfen",
-      "entkräftet"
-    ],
-    correct: 3
+    options: ["ungesunde", "unwichtige", "beschädigte", "berührte"],
+    correct: 0,
   },
+
   {
-    // Verb
-    options: [
-      "Obgleich",
-      "Insofern",
-      "Soweit",
-      "Zumal"
-    ],
-    correct: 0
+  options: ["Befreiung", "Freiheit", "Belastung", "Freisetzung"],
+  correct: 3,
+},
+
+  {
+    options: ["zeitgleich", "zeitnah", "regelmäßig", "pünktlich"],
+    correct: 2,
   },
+
   {
-    // Adjektiv
-    options: [
-      "nuancierte",
-      "punktgenaue",
-      "differenzierte",
-      "akribische"
-    ],
-    correct: 2
+    options: ["annehmen", "wahrnehmen", "verstehen", "einnehmen"],
+    correct: 1,
   },
+
   {
-    // Nomen
-    options: [
-      "unwillkürlich",
-      "spürbar",
-      "drastisch",
-      "schleichend"
-    ],
-    correct: 3
+    options: ["Augenblick", "Anblick", "Ausblick", "Blick"],
+    correct: 3,
   },
-  {
-    // Verb
-    options: [
-      "Verwertung",
-      "Erhebung",
-      "Preisgabe",
-      "Auswertung"
-    ],
-    correct: 0
-  }
 ];
-/* ============================================================ */
 
-let userAnswers = new Array(gaps.length).fill(null);
-let timeLeft = 240;
-let timerInterval;
-let fontSize = 16;
-let markingOn = false;
-let openDropdownGap = null;
+      /* ============================================================ */
 
-function buildExercise(){
-  const tp = document.getElementById('textpanel');
-  let html = `<h3>${textTitle}</h3>` + textHTML;
-  html = html.replace(/\[\[(\d+)\]\]/g, (m, num)=>{
-    const idx = parseInt(num) - 1;
-    return `<span class="gap" data-gap="${idx}" onclick="toggleDropdown(event, ${idx})">____</span>`;
-  });
-  tp.innerHTML = html;
+      let userAnswers = new Array(gaps.length).fill(null);
+      let timeLeft = 250;
+      let timerInterval;
+      let fontSize = 16;
+      let markingOn = false;
+      let openDropdownGap = null;
 
-  fontSize = 16;
-  tp.style.fontSize = fontSize + 'px';
-  markingOn = false;
-  document.getElementById('markBtn').classList.remove('active');
-  tp.onmouseup = handleTextpanelMouseUp;
+      function buildExercise() {
+        const tp = document.getElementById("textpanel");
+        let html = `<h3>${textTitle}</h3>` + textHTML;
+        html = html.replace(/\[\[(\d+)\]\]/g, (m, num) => {
+          const idx = parseInt(num) - 1;
+          return `<span class="gap" data-gap="${idx}" onclick="toggleDropdown(event, ${idx})">____</span>`;
+        });
+        tp.innerHTML = html;
 
-  userAnswers = new Array(gaps.length).fill(null);
-  gaps.forEach((g,i)=>{
-    const span = tp.querySelector(`.gap[data-gap="${i}"]`);
-    span.textContent = '____';
-    span.classList.remove('filled','correct','wrong');
-  });
+        fontSize = 16;
+        tp.style.fontSize = fontSize + "px";
+        markingOn = false;
+        document.getElementById("markBtn").classList.remove("active");
+        tp.onmouseup = handleTextpanelMouseUp;
 
-  document.getElementById('result').textContent = '';
-  startTimer();
-}
+        userAnswers = new Array(gaps.length).fill(null);
+        gaps.forEach((g, i) => {
+          const span = tp.querySelector(`.gap[data-gap="${i}"]`);
+          span.textContent = "____";
+          span.classList.remove("filled", "correct", "wrong");
+        });
 
-function closeAnyDropdown(){
-  const existing = document.querySelector('.dropdown');
-  if(existing) existing.remove();
-  openDropdownGap = null;
-}
+        document.getElementById("result").textContent = "";
+        startTimer();
+      }
 
-function toggleDropdown(e, idx){
-  e.stopPropagation();
-  
-  if(openDropdownGap === idx){ closeAnyDropdown(); return; }
-  closeAnyDropdown();
-  openDropdownGap = idx;
+      function closeAnyDropdown() {
+        const existing = document.querySelector(".dropdown");
+        if (existing) existing.remove();
+        openDropdownGap = null;
+      }
 
-  const span = e.currentTarget;
-  const dd = document.createElement('div');
-  dd.className = 'dropdown';
+      function toggleDropdown(e, idx) {
+        e.stopPropagation();
 
-  const clearBtn = document.createElement('button');
-  clearBtn.className = 'clear';
-  clearBtn.textContent = 'x';
-  clearBtn.onclick = (ev)=>{ ev.stopPropagation(); setGapAnswer(idx, null); closeAnyDropdown(); };
-  dd.appendChild(clearBtn);
+        if (openDropdownGap === idx) {
+          closeAnyDropdown();
+          return;
+        }
+        closeAnyDropdown();
+        openDropdownGap = idx;
 
-  gaps[idx].options.forEach((opt, oi)=>{
-    const b = document.createElement('button');
-    b.textContent = opt;
-    b.onclick = (ev)=>{ ev.stopPropagation(); setGapAnswer(idx, oi); closeAnyDropdown(); };
-    dd.appendChild(b);
-  });
+        const span = e.currentTarget;
+        const dd = document.createElement("div");
+        dd.className = "dropdown";
 
-  span.appendChild(dd);
-}
+        const clearBtn = document.createElement("button");
+        clearBtn.className = "clear";
+        clearBtn.textContent = "x";
+        clearBtn.onclick = (ev) => {
+          ev.stopPropagation();
+          setGapAnswer(idx, null);
+          closeAnyDropdown();
+        };
+        dd.appendChild(clearBtn);
 
-function setGapAnswer(idx, oi){
-  userAnswers[idx] = oi;
-  const span = document.querySelector(`.gap[data-gap="${idx}"]`);
-  span.classList.remove('correct','wrong');
-  if(oi === null){
-    span.textContent = '____';
-    span.classList.remove('filled');
-  } else {
-    span.textContent = gaps[idx].options[oi];
-    span.classList.add('filled');
-  }
-}
+        gaps[idx].options.forEach((opt, oi) => {
+          const b = document.createElement("button");
+          b.textContent = opt;
+          b.onclick = (ev) => {
+            ev.stopPropagation();
+            setGapAnswer(idx, oi);
+            closeAnyDropdown();
+          };
+          dd.appendChild(b);
+        });
 
-document.addEventListener('click', closeAnyDropdown);
+        span.appendChild(dd);
+      }
 
-function saveAndGoToNext(){
+      function setGapAnswer(idx, oi) {
+        userAnswers[idx] = oi;
+        const span = document.querySelector(`.gap[data-gap="${idx}"]`);
+        span.classList.remove("correct", "wrong");
+        if (oi === null) {
+          span.textContent = "____";
+          span.classList.remove("filled");
+        } else {
+          span.textContent = gaps[idx].options[oi];
+          span.classList.add("filled");
+        }
+      }
 
-  let score = 0;
+      document.addEventListener("click", closeAnyDropdown);
 
-  gaps.forEach((g, idx)=>{
-    if(userAnswers[idx] === g.correct){
-      score++;
-    }
-  });
+      function saveAndGoToNext() {
+        let score = 0;
 
-  // نمره
-  localStorage.setItem("Lesen_AT1", score);
+        gaps.forEach((g, idx) => {
+          if (userAnswers[idx] === g.correct) {
+            score++;
+          }
+        });
 
-  // جواب‌های کاربر
-  localStorage.setItem(
-    "Lesen_AT1_answers",
-    JSON.stringify(userAnswers)
-  );
+        localStorage.setItem("Lesen_AT1.5", score);
 
-  // جواب‌های صحیح
-  localStorage.setItem(
-    "Lesen_AT1_correct",
-    JSON.stringify(gaps.map(g => g.correct))
-  );
+        window.location.href = "Lesen_AT2.5.html";
+      }
 
-  window.location.href = "Lesen_AT2.html";
-}
+      function checkAnswers() {
+        clearInterval(timerInterval);
+        let score = 0;
+        gaps.forEach((g, idx) => {
+          const span = document.querySelector(`.gap[data-gap="${idx}"]`);
+          span.classList.remove("correct", "wrong");
+          if (userAnswers[idx] === g.correct) {
+            span.classList.add("correct");
+            score++;
+          } else {
+            span.classList.add("wrong");
+          }
+        });
+        const resultEl = document.getElementById("result");
 
+        localStorage.setItem("Lesen_AT1.5", score);
 
-function checkAnswers(){
-  clearInterval(timerInterval);
-  let score = 0;
-  gaps.forEach((g, idx)=>{
-    const span = document.querySelector(`.gap[data-gap="${idx}"]`);
-    span.classList.remove('correct','wrong');
-    if(userAnswers[idx] === g.correct){
-      span.classList.add('correct');
-      score++;
-    } else {
-      span.classList.add('wrong');
-    }
-  });
-  const resultEl = document.getElementById('result');
+        resultEl.style.color =
+          score === gaps.length ? "green" : "var(--accent)";
+        resultEl.textContent = `Ergebnis: ${score} von ${gaps.length} richtig.`;
+      }
 
-  localStorage.setItem("Lesen_AT1", score);
+      function resetExercise() {
+        clearInterval(timerInterval);
+        timeLeft = 250;
+        buildExercise();
+      }
 
-  resultEl.style.color = score === gaps.length ? 'green' : 'var(--accent)';
-  resultEl.textContent = `Ergebnis: ${score} von ${gaps.length} richtig.`;
-  }
+      function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = 250;
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          updateTimerDisplay();
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            checkAnswers();
+          }
+        }, 1000);
+      }
 
+      function updateTimerDisplay() {
+        const m = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+        const s = String(timeLeft % 60).padStart(2, "0");
+        document.getElementById("timer").textContent = `${m}:${s}`;
+      }
 
+      function changeFontSize(delta) {
+        fontSize = Math.min(24, Math.max(12, fontSize + delta));
+        document.getElementById("textpanel").style.fontSize = fontSize + "px";
+      }
 
-function resetExercise(){
-  clearInterval(timerInterval);
-  timeLeft = 240;
-  buildExercise();
-}
+      function toggleMarking() {
+        markingOn = !markingOn;
+        const btn = document.getElementById("markBtn");
+        btn.classList.toggle("active", markingOn);
+        closeAnyDropdown();
+      }
 
-function startTimer(){
-  clearInterval(timerInterval);
-  timeLeft = 240;
-  updateTimerDisplay();
-  timerInterval = setInterval(()=>{
-    timeLeft--;
-    updateTimerDisplay();
-    if(timeLeft<=0){
-      clearInterval(timerInterval);
-      checkAnswers();
-    }
-  },1000);
-}
+      function handleTextpanelMouseUp() {
+        if (!markingOn) return;
+        const sel = window.getSelection();
+        if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+        const range = sel.getRangeAt(0);
+        const tp = document.getElementById("textpanel");
+        if (!tp.contains(range.commonAncestorContainer)) return;
+        if (range.toString().trim() === "") {
+          sel.removeAllRanges();
+          return;
+        }
+        try {
+          const mark = document.createElement("mark");
+          mark.className = "hl";
+          range.surroundContents(mark);
+        } catch (e) {}
+        sel.removeAllRanges();
+      }
 
-function updateTimerDisplay(){
-  const m = String(Math.floor(timeLeft/60)).padStart(2,'0');
-  const s = String(timeLeft%60).padStart(2,'0');
-  document.getElementById('timer').textContent = `${m}:${s}`;
-}
+      document.addEventListener("click", function (e) {
+        const mark = e.target.closest("mark.hl");
+        if (mark) {
+          const parent = mark.parentNode;
+          while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+          parent.removeChild(mark);
+          parent.normalize();
+        }
+      });
 
-function changeFontSize(delta){
-  fontSize = Math.min(24, Math.max(12, fontSize + delta));
-  document.getElementById('textpanel').style.fontSize = fontSize + 'px';
-}
-
-function toggleMarking(){
-  markingOn = !markingOn;
-  const btn = document.getElementById('markBtn');
-  btn.classList.toggle('active', markingOn);
-  closeAnyDropdown();
-}
-
-function handleTextpanelMouseUp(){
-  if(!markingOn) return;
-  const sel = window.getSelection();
-  if(!sel || sel.isCollapsed || sel.rangeCount === 0) return;
-  const range = sel.getRangeAt(0);
-  const tp = document.getElementById('textpanel');
-  if(!tp.contains(range.commonAncestorContainer)) return;
-  if(range.toString().trim() === '') { sel.removeAllRanges(); return; }
-  try{
-    const mark = document.createElement('mark');
-    mark.className = 'hl';
-    range.surroundContents(mark);
-  }catch(e){}
-  sel.removeAllRanges();
-}
-
-document.addEventListener('click', function(e){
-  const mark = e.target.closest('mark.hl');
-  if(mark){
-    const parent = mark.parentNode;
-    while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
-    parent.removeChild(mark);
-    parent.normalize();
-  }
-});
-
-window.addEventListener('load', () => {
-  buildExercise();
-});
-</script>
-
-</body>
+      window.addEventListener("load", () => {
+        buildExercise();
+      });
+    </script>
+  </body>
 </html>
